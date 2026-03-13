@@ -2,15 +2,23 @@
 
 ## ✨ Nueva Funcionalidad: Correcciones Automáticas
 
-¡Ahora puedes corregir automáticamente los warnings de ValueObjects con un solo clic!
+¡Ahora puedes corregir automáticamente errores y warnings DDD con un solo clic!
 
 ---
 
 ## 🎯 Quick Fixes Disponibles
 
+### **DDD001/DDD002 - Agregar propiedad Id con [EntityId]** ⭐ NUEVO
+
+Cuando una `Entity` o `AggregateRoot` no tiene propiedad `[EntityId]`, puedes agregarla automáticamente.
+
+**Ver guía detallada:** [ENTITYID_CODEFIX.md](ENTITYID_CODEFIX.md)
+
 ### **DDD007/DDD008 - Agregar Equals y GetHashCode**
 
 Cuando un `ValueObject` no tiene `Equals` y/o `GetHashCode`, puedes agregarlos automáticamente.
+
+**Ver guía detallada:** [TYPE_HANDLING.md](TYPE_HANDLING.md)
 
 ---
 
@@ -196,11 +204,13 @@ Después de esto, los Quick Fixes funcionarán automáticamente.
 
 ## 🎯 Próximos Code Fixes Planeados
 
-- [ ] **DDD001**: Agregar automáticamente propiedad `[EntityId]` a Entities
-- [ ] **DDD002**: Agregar automáticamente propiedad `[EntityId]` a AggregateRoots
+- [x] ~~**DDD001/002**: Agregar automáticamente propiedad `[EntityId]`~~ ✅ **IMPLEMENTADO**
+- [x] ~~**DDD007/008**: Agregar Equals y GetHashCode~~ ✅ **IMPLEMENTADO**
 - [ ] **DDD004**: Convertir setter público a privado en ValueObjects
+- [ ] **DDD005/006**: Remover atributos DDD conflictivos
 - [ ] Agregar operadores `==` y `!=` a ValueObjects
 - [ ] Implementar `IEquatable<T>` en ValueObjects
+- [ ] Agregar constructor con inicialización de ID
 
 ---
 

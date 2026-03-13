@@ -101,11 +101,29 @@ namespace DDD.Analyzers
 
 		public static readonly DiagnosticDescriptor NoCrossContextDirectReference = new DiagnosticDescriptor(
 			id: "DDD011",
-			title: "No se pueden hacer referencias directas entre Bounded Contexts",
-			messageFormat: "La clase '{0}' (BC: '{1}') referencia directamente '{2}' (BC: '{3}'). Usa el Id en su lugar.",
+			title: "No se pueden referenciar AggregateRoots de otro Bounded Context directamente",
+			messageFormat: "La clase '{0}' (BC: '{1}') referencia directamente el AggregateRoot '{2}' (BC: '{3}'). Entre BCs solo se pueden intercambiar identidades — usa '{2}Id' (el Id del agregado) en su lugar.",
 			category: Category,
 			defaultSeverity: DiagnosticSeverity.Error,
 			isEnabledByDefault: true,
-			description: "Las clases de distintos Bounded Contexts no deben referenciarse directamente. Usa el identificador (Id) del tipo en lugar de una referencia directa.");
+			description: "Entre Bounded Contexts distintos solo se deben intercambiar identidades (Ids) de Aggregate Roots, nunca referencias directas. Reemplaza la propiedad por el Id del Aggregate Root referenciado.");
+
+		public static readonly DiagnosticDescriptor NoCrossContextEntityReference = new DiagnosticDescriptor(
+			id: "DDD011",
+			title: "No se pueden referenciar Entidades internas de otro Bounded Context",
+			messageFormat: "La clase '{0}' (BC: '{1}') referencia la entidad interna '{2}' (BC: '{3}'). Las entidades internas no deben exponerse fuera de su Bounded Context — accede solo a través del AggregateRoot de '{3}'.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Error,
+			isEnabledByDefault: true,
+			description: "Las entidades internas de un Bounded Context son un detalle de implementación y no deben ser visibles desde otros BCs. Accede siempre a través del Aggregate Root del BC propietario.");
+
+		public static readonly DiagnosticDescriptor NoCrossContextValueObjectReference = new DiagnosticDescriptor(
+			id: "DDD011",
+			title: "No se pueden referenciar ValueObjects de otro Bounded Context",
+			messageFormat: "La clase '{0}' (BC: '{1}') referencia el ValueObject '{2}' (BC: '{3}'). Los ValueObjects de otro BC deben copiarse o abstraerse en el BC propio — no referenciarlos directamente.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Error,
+			isEnabledByDefault: true,
+			description: "Los Value Objects pertenecen al BC que los define. Si necesitas su concepto en otro BC, crea tu propia representación local o muévelo a SharedKernel.");
 	}
 }

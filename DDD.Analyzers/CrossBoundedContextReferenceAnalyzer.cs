@@ -16,7 +16,10 @@ namespace DDD.Analyzers
 	public class CrossBoundedContextReferenceAnalyzer : DiagnosticAnalyzer
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-			ImmutableArray.Create(DiagnosticDescriptors.NoCrossContextDirectReference);
+			ImmutableArray.Create(
+				DiagnosticDescriptors.NoCrossContextDirectReference,
+				DiagnosticDescriptors.NoCrossContextEntityReference,
+				DiagnosticDescriptors.NoCrossContextValueObjectReference);
 
 		public override void Initialize(AnalysisContext context)
 		{
@@ -55,15 +58,17 @@ namespace DDD.Analyzers
 					continue;
 
 				// El tipo referenciado debe ser [Entity], [AggregateRoot] o [ValueObject]
-				var isDddType = propertyType.GetAttributes().Any(a =>
-					a.AttributeClass?.Name == "EntityAttribute" ||
-					a.AttributeClass?.Name == "AggregateRootAttribute" ||
-					a.AttributeClass?.Name == "ValueObjectAttribute");
+				var referencedAttributes = propertyType.GetAttributes();
+
+				bool isAggregateRoot = referencedAttributes.Any(a => a.AttributeClass?.Name == "AggregateRootAttribute");
+				bool isEntity = referencedAttributes.Any(a => a.AttributeClass?.Name == "EntityAttribute");
+				bool isValueObject = referencedAttributes.Any(a => a.AttributeClass?.Name == "ValueObjectAttribute");
+				bool isDddType = isAggregateRoot || isEntity || isValueObject;
 
 				if (!isDddType)
 					continue;
 
-				var referencedIsSharedKernel = propertyType.GetAttributes()
+				var referencedIsSharedKernel = referencedAttributes
 					.Any(a => a.AttributeClass?.Name == "SharedKernelAttribute");
 
 				var referencedBoundedContext = GetBoundedContextName(propertyType);
@@ -71,15 +76,12 @@ namespace DDD.Analyzers
 				// Regla 1: [SharedKernel] no puede referenciar tipos de un BC específico
 				if (ownerIsSharedKernel && referencedBoundedContext != null)
 				{
-					var diagnostic = Diagnostic.Create(
-						DiagnosticDescriptors.NoCrossContextDirectReference,
+					var descriptor = GetDescriptor(isAggregateRoot, isEntity);
+					context.ReportDiagnostic(Diagnostic.Create(
+						descriptor,
 						member.GetLocation(),
-						classSymbol.Name,
-						"SharedKernel",
-						propertyType.Name,
-						referencedBoundedContext);
-
-					context.ReportDiagnostic(diagnostic);
+						classSymbol.Name, "SharedKernel",
+						propertyType.Name, referencedBoundedContext));
 					continue;
 				}
 
@@ -91,15 +93,12 @@ namespace DDD.Analyzers
 				if (ownerBoundedContext != null && referencedBoundedContext != null &&
 					ownerBoundedContext != referencedBoundedContext)
 				{
-					var diagnostic = Diagnostic.Create(
-						DiagnosticDescriptors.NoCrossContextDirectReference,
+					var descriptor = GetDescriptor(isAggregateRoot, isEntity);
+					context.ReportDiagnostic(Diagnostic.Create(
+						descriptor,
 						member.GetLocation(),
-						classSymbol.Name,
-						ownerBoundedContext,
-						propertyType.Name,
-						referencedBoundedContext);
-
-					context.ReportDiagnostic(diagnostic);
+						classSymbol.Name, ownerBoundedContext,
+						propertyType.Name, referencedBoundedContext));
 				}
 			}
 		}
@@ -113,6 +112,15 @@ namespace DDD.Analyzers
 				return null;
 
 			return bcAttribute.ConstructorArguments.FirstOrDefault().Value?.ToString();
+		}
+
+		private static DiagnosticDescriptor GetDescriptor(bool isAggregateRoot, bool isEntity)
+		{
+			if (isAggregateRoot)
+				return DiagnosticDescriptors.NoCrossContextDirectReference;
+			if (isEntity)
+				return DiagnosticDescriptors.NoCrossContextEntityReference;
+			return DiagnosticDescriptors.NoCrossContextValueObjectReference;
 		}
 	}
 }

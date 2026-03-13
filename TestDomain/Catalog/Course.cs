@@ -5,7 +5,7 @@ namespace TestDomain.Catalog
 {
     [BoundedContext("Catalog")]  // DDD010: 'Course' declara su Bounded Context
     [AggregateRoot]
-    internal class Course
+    public class Course
     {
         // Agregamos la propiedad con [EntityId] como identificador de la entidad. Regla DDD001
         [EntityId]

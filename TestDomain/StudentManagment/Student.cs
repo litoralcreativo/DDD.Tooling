@@ -1,5 +1,6 @@
 using DDD.Abstractions;
 using System;
+using TestDomain.Catalog;
 using TestDomain.SharedKernel;
 
 namespace TestDomain.StudentManagment
@@ -16,6 +17,8 @@ namespace TestDomain.StudentManagment
 		public DateTime EnrollmentDate { get; private set; }
 
 		public Address Address { get; set; }
+
+		public Course Course { get; set; } // ❌ DDD011: Student (StudentManagment) → Course (Catalog)
 
 		public static Student Create(Guid studentId, string firstName, string lastName, Address address)
 		{

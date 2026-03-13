@@ -7,9 +7,13 @@
 - [x] **DDD002** - Validar que AggregateRoot tenga EntityId ❌ Error
     - [x] Code Fix: agrega `[EntityId] public Guid Id { get; private set; }` automáticamente
 - [x] **DDD003** - EntityId solo en propiedades, no en campos ❌ Error
+    - [x] Code Fix: convierte el campo en propiedad automáticamente
 - [x] **DDD004** - Validar inmutabilidad de ValueObjects ⚠️ Warning
+    - [x] Code Fix: convierte setter público a `{ get; private set; }`
 - [x] **DDD005** - Prevenir Entity + ValueObject simultáneamente ❌ Error
+    - [x] Code Fix: elimina el atributo `[ValueObject]` conflictivo
 - [x] **DDD006** - Prevenir AggregateRoot + ValueObject simultáneamente ❌ Error
+    - [x] Code Fix: elimina el atributo `[ValueObject]` conflictivo
 - [x] **DDD007** - ValueObject debe sobrescribir Equals ⚠️ Warning
     - [x] Code Fix: genera `Equals` con comparación de todas las propiedades
 - [x] **DDD008** - ValueObject debe sobrescribir GetHashCode ⚠️ Warning
@@ -31,16 +35,39 @@
     - [x] Detecta campos y propiedades privadas/protegidas
     - [ ] Code Fix: sin fix por decisión de diseño (requiere juicio del desarrollador)
 
+## ✅ Implementado (v1.2)
+
+- [x] **DDD013** - Solo puede haber un `[EntityId]` por clase ❌ Error
+    - [x] Detecta múltiples propiedades con `[EntityId]` en la misma entidad o agregado
+    - [ ] Code Fix: sin fix por decisión de diseño (¿cuál ID es el correcto?)
+
 ## 🚧 Próximas Implementaciones
 
-### Fase 2 - Code Fixes Pendientes
+### Fase 2 - Testing Framework
 
-- [ ] **Code Fix para DDD004**: Convertir setters públicos a `{ get; }` o `{ get; private set; }`
-- [ ] **Code Fix para DDD005/DDD006**: Ofrecer remover uno de los atributos conflictivos
+- [ ] Crear proyecto `DDD.Analyzers.Tests`
+- [ ] Tests unitarios para cada analizador
+- [ ] Tests de verificación de Code Fixes
+- [ ] Integración con GitHub Actions / Azure Pipelines
 
-### Fase 3 - Analizadores Adicionales
+### Fase 3 - Documentación y Packaging
 
-#### DDD013 - Repository pattern
+- [ ] Generar documentación completa con ejemplos
+- [ ] Crear package NuGet público
+- [ ] Logo y branding
+- [ ] Wiki con patrones DDD comunes
+- [ ] Video tutoriales
+
+### Fase 4 - Integración con IDEs
+
+- [ ] Snippets para VS Code
+- [ ] Snippets para Visual Studio
+- [ ] Plantillas de Item Templates para Entity, ValueObject, AggregateRoot
+- [ ] Extension VS Code con comandos personalizados
+
+### Fase 5 - Analizadores Adicionales
+
+#### DDD014 - Repository pattern
 
 ```csharp
 // Validar que los repositorios solo trabajen con AggregateRoots
@@ -50,29 +77,7 @@ public interface IProductRepository  // ⚠️ Warning: Product no es AggregateR
 }
 ```
 
-### Fase 4 - Testing Framework
-
-- [ ] Crear proyecto `DDD.Analyzers.Tests`
-- [ ] Tests unitarios para cada analizador
-- [ ] Tests de verificación de Code Fixes
-- [ ] Integración con GitHub Actions / Azure Pipelines
-
-### Fase 5 - Documentación y Packaging
-
-- [ ] Generar documentación completa con ejemplos
-- [ ] Crear package NuGet público
-- [ ] Logo y branding
-- [ ] Wiki con patrones DDD comunes
-- [ ] Video tutoriales
-
-### Fase 6 - Integración con IDEs
-
-- [ ] Snippets para VS Code
-- [ ] Snippets para Visual Studio
-- [ ] Plantillas de Item Templates para Entity, ValueObject, AggregateRoot
-- [ ] Extension VS Code con comandos personalizados
-
-### Fase 7 - Características Avanzadas
+### Fase 6 - Características Avanzadas
 
 - [ ] Análisis de dependencias entre Aggregates
 - [ ] Detector de Anemic Domain Model

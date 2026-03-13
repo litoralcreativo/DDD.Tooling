@@ -234,10 +234,9 @@ Errors:
 
 ## 🚀 Próximos Pasos
 
-1. **Agregar más reglas** según el ROADMAP.md
-2. **Crear Code Fixes** para auto-correcciones
-3. **Tests unitarios** para cada analizador
-4. **Publicar NuGet package** para uso público
+1. **Tests unitarios** para cada analizador
+2. **Publicar NuGet package** para uso público
+3. **Nuevas reglas** según el ROADMAP.md (DDD014+)
 
 ---
 

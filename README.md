@@ -8,8 +8,8 @@ Proporcionar validación en tiempo de compilación de las reglas y patrones de D
 
 ## ✨ Características
 
-- ✅ **12 Reglas** de análisis DDD (DDD001-DDD012)
-- ✅ **5 Code Fix Providers** para corregir automáticamente errores/warnings
+- ✅ **13 Reglas** de análisis DDD (DDD001-DDD013)
+- ✅ **7 Code Fix Providers** para corregir automáticamente errores/warnings
 - ✅ **Sugerencias educativas (Info)** para mejorar el diseño
 - ✅ **Manejo inteligente de tipos** (detecta automáticamente structs, nullables, referencias)
 - ✅ **Detección de referencias cruzadas** entre Bounded Contexts (DDD010-DDD012)
@@ -39,8 +39,11 @@ DDD.Tooling/
 │   ├── EntityFactoryMethodAnalyzer.cs                # DDD009
 │   ├── BoundedContextDeclarationAnalyzer.cs          # DDD010
 │   ├── CrossBoundedContextReferenceAnalyzer.cs       # DDD011, DDD012
+│   ├── MultipleEntityIdAnalyzer.cs                   # DDD013
 │   └── CodeFixes/
 │       ├── EntityIdCodeFixProvider.cs                # Fix para DDD001/002
+│       ├── EntityIdOnPropertyCodeFixProvider.cs      # Fix para DDD003
+│       ├── ValueObjectMutabilityCodeFixProvider.cs   # Fix para DDD004/005/006
 │       ├── ValueObjectEqualsCodeFixProvider.cs       # Fix para DDD007/008
 │       ├── EntityFactoryMethodCodeFixProvider.cs     # Fix para DDD009
 │       ├── BoundedContextDeclarationCodeFixProvider.cs # Fix para DDD010
@@ -100,11 +103,15 @@ public class Product
 
 **Descripción**: El atributo `[EntityId]` solo puede aplicarse a propiedades, no a campos u otros miembros.
 
+**Quick Fix disponible**: Convierte el campo en una propiedad con `{ get; private set; }` automáticamente.
+
 ---
 
 ### DDD004 - ValueObject debe ser inmutable ⚠️ Warning
 
 **Descripción**: Los Value Objects no deben tener setters públicos en sus propiedades para garantizar inmutabilidad.
+
+**Quick Fix disponible**: Convierte el setter público a `{ get; private set; }` o `{ get; }` automáticamente.
 
 **Ejemplo incorrecto:**
 
@@ -140,11 +147,15 @@ public class Money
 
 **Descripción**: Una clase no puede estar decorada con `[Entity]` y `[ValueObject]` al mismo tiempo.
 
+**Quick Fix disponible**: Elimina el atributo `[ValueObject]` automáticamente.
+
 ---
 
 ### DDD006 - No puede ser AggregateRoot y ValueObject simultáneamente ❌ Error
 
 **Descripción**: Una clase no puede estar decorada con `[AggregateRoot]` y `[ValueObject]` al mismo tiempo.
+
+**Quick Fix disponible**: Elimina el atributo `[ValueObject]` automáticamente.
 
 ---
 
@@ -285,6 +296,39 @@ public class Student
 }
 ```
 
+### DDD013 - Solo puede haber un EntityId por clase ❌ Error
+
+**Descripción**: Una clase decorada con `[Entity]` o `[AggregateRoot]` no puede tener más de una propiedad decorada con `[EntityId]`. En DDD, cada entidad tiene un único identificador.
+
+> ⚠️ No tiene Code Fix asociado — requiere decisión de diseño por parte del desarrollador (¿cuál de los dos IDs es el correcto?).
+
+**Ejemplo incorrecto:**
+
+```csharp
+[Entity]
+public class Product
+{
+    [EntityId]
+    public Guid Id { get; private set; }    // ❌ DDD013
+
+    [EntityId]
+    public Guid LegacyId { get; private set; }  // ❌ DDD013: duplicado
+}
+```
+
+**Ejemplo correcto:**
+
+```csharp
+[Entity]
+public class Product
+{
+    [EntityId]
+    public Guid Id { get; private set; }  // ✅ Un único EntityId
+
+    public Guid LegacyId { get; private set; }  // ✅ Sin atributo
+}
+```
+
 ---
 
 ## 🚀 Uso
@@ -378,9 +422,8 @@ El proyecto `TestDomain` contiene ejemplos de uso correcto e incorrecto, organiz
 
 ## 🎯 Próximas Reglas a Implementar
 
-- [ ] Code Fix para DDD004 - Convertir setters públicos a privados/init
-- [ ] Code Fix para DDD005/006 - Remover atributos conflictivos
 - [ ] Tests unitarios para todos los analizadores
+- [ ] Publicar NuGet package
 
 ## 📄 Licencia
 

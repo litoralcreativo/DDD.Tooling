@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDD.Abstractions", "DDD.Abs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestDomain", "TestDomain\TestDomain.csproj", "{76F38C54-E949-4284-B08D-DD529D1B1124}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DDD.Analyzers", "DDD.Analyzers\DDD.Analyzers.csproj", "{CE2C8733-7320-4E3E-8BE1-0E29189B0620}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{76F38C54-E949-4284-B08D-DD529D1B1124}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{76F38C54-E949-4284-B08D-DD529D1B1124}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{76F38C54-E949-4284-B08D-DD529D1B1124}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE2C8733-7320-4E3E-8BE1-0E29189B0620}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE2C8733-7320-4E3E-8BE1-0E29189B0620}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE2C8733-7320-4E3E-8BE1-0E29189B0620}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE2C8733-7320-4E3E-8BE1-0E29189B0620}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

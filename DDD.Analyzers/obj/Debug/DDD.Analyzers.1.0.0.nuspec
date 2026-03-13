@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>DDD.Analyzers</id>
+    <version>1.0.0</version>
+    <authors>DDD Tooling</authors>
+    <developmentDependency>true</developmentDependency>
+    <license type="expression">MIT</license>
+    <licenseUrl>https://licenses.nuget.org/MIT</licenseUrl>
+    <projectUrl>https://github.com/yourusername/DDD.Tooling</projectUrl>
+    <description>Analizadores Roslyn para validar reglas de Domain-Driven Design</description>
+    <releaseNotes>Validación de reglas DDD en tiempo de compilación</releaseNotes>
+    <copyright>Copyright</copyright>
+    <tags>DDD, Domain-Driven Design, Roslyn, Analyzers</tags>
+    <repository type="git" url="https://github.com/yourusername/DDD.Tooling" commit="660b615f245ceb83b8115201d5c3a5d9c155b716" />
+  </metadata>
+  <files>
+    <file src="D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\bin\Debug\netstandard2.0\DDD.Analyzers.dll" target="analyzers\dotnet\cs\DDD.Analyzers.dll" />
+    <file src="D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\bin\Debug\netstandard2.0\DDD.Abstractions.dll" target="analyzers\dotnet\cs\DDD.Abstractions.dll" />
+  </files>
+</package>

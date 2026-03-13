@@ -1,0 +1,74 @@
+# EditorConfig para DDD.Tooling
+# https://editorconfig.org
+
+root = true
+
+# Configuración general para todos los archivos
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Archivos de configuración
+[*.{json,yml,yaml}]
+indent_size = 2
+
+# Archivos Markdown
+[*.md]
+trim_trailing_whitespace = false
+
+# Archivos C#
+[*.cs]
+
+# Configuración de analizadores DDD
+# Severidades: none, silent, suggestion, warning, error
+
+# DDD001: Entity debe tener EntityId
+dotnet_diagnostic.DDD001.severity = error
+
+# DDD002: AggregateRoot debe tener EntityId
+dotnet_diagnostic.DDD002.severity = error
+
+# DDD003: EntityId solo en propiedades (no implementado aún)
+dotnet_diagnostic.DDD003.severity = error
+
+# DDD004: ValueObject debe ser inmutable
+dotnet_diagnostic.DDD004.severity = warning
+
+# DDD005: No puede ser Entity y ValueObject
+dotnet_diagnostic.DDD005.severity = error
+
+# DDD006: No puede ser AggregateRoot y ValueObject
+dotnet_diagnostic.DDD006.severity = error
+
+# Reglas de estilo C# (opcional)
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+
+# Usar 'var' cuando sea obvio
+csharp_style_var_for_built_in_types = false
+csharp_style_var_when_type_is_apparent = true
+csharp_style_var_elsewhere = false
+
+# Preferencias de expresión
+csharp_prefer_braces = true:suggestion
+dotnet_style_prefer_auto_properties = true:suggestion
+dotnet_style_prefer_inferred_tuple_names = true:suggestion
+dotnet_style_prefer_inferred_anonymous_type_member_names = true:suggestion
+
+# Preferencias de null
+csharp_style_throw_expression = true:suggestion
+csharp_style_conditional_delegate_call = true:suggestion
+
+# Modificadores
+csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:suggestion
+dotnet_style_require_accessibility_modifiers = always:suggestion
+dotnet_style_readonly_field = true:suggestion
+
+# Organización de usings
+dotnet_sort_system_directives_first = true
+dotnet_separate_import_directive_groups = false

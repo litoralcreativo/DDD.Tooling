@@ -1,0 +1,10 @@
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Abstractions\bin\Debug\netstandard2.0\DDD.Abstractions.deps.json
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Abstractions\bin\Debug\netstandard2.0\DDD.Abstractions.dll
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Abstractions\bin\Debug\netstandard2.0\DDD.Abstractions.pdb
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Abstractions\obj\Debug\netstandard2.0\DDD.Abstractions.csproj.AssemblyReference.cache
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Abstractions\obj\Debug\netstandard2.0\DDD.Abstractions.GeneratedMSBuildEditorConfig.editorconfig
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Abstractions\obj\Debug\netstandard2.0\DDD.Abstractions.AssemblyInfoInputs.cache
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Abstractions\obj\Debug\netstandard2.0\DDD.Abstractions.AssemblyInfo.cs
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Abstractions\obj\Debug\netstandard2.0\DDD.Abstractions.csproj.CoreCompileInputs.cache
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Abstractions\obj\Debug\netstandard2.0\DDD.Abstractions.dll
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Abstractions\obj\Debug\netstandard2.0\DDD.Abstractions.pdb

@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DDD.Abstractions\DDD.Abstractions.csproj" />
+    <ProjectReference Include="..\DDD.Analyzers\DDD.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

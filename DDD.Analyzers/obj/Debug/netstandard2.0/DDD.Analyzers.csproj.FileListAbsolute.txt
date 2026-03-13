@@ -1,0 +1,13 @@
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\bin\Debug\netstandard2.0\DDD.Analyzers.deps.json
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\bin\Debug\netstandard2.0\DDD.Analyzers.dll
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\bin\Debug\netstandard2.0\DDD.Analyzers.pdb
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\bin\Debug\netstandard2.0\DDD.Abstractions.dll
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\bin\Debug\netstandard2.0\DDD.Abstractions.pdb
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\obj\Debug\netstandard2.0\DDD.Analyzers.csproj.AssemblyReference.cache
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\obj\Debug\netstandard2.0\DDD.Analyzers.GeneratedMSBuildEditorConfig.editorconfig
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\obj\Debug\netstandard2.0\DDD.Analyzers.AssemblyInfoInputs.cache
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\obj\Debug\netstandard2.0\DDD.Analyzers.AssemblyInfo.cs
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\obj\Debug\netstandard2.0\DDD.Analyzers.csproj.CoreCompileInputs.cache
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\obj\Debug\netstandard2.0\DDD.Anal.57C9A8CA.Up2Date
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\obj\Debug\netstandard2.0\DDD.Analyzers.dll
+D:\DOCUMENTOS\WEB_PROJECTS\DDD.Tooling\DDD.Analyzers\obj\Debug\netstandard2.0\DDD.Analyzers.pdb

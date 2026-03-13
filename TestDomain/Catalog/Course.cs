@@ -1,5 +1,6 @@
 ﻿using DDD.Abstractions;
 using System;
+using System.Collections.Generic;
 
 namespace TestDomain.Catalog
 {
@@ -10,6 +11,9 @@ namespace TestDomain.Catalog
         // Agregamos la propiedad con [EntityId] como identificador de la entidad. Regla DDD001
         [EntityId]
         public Guid Id { get; private set; }
+
+        private List<CourseModule> _modules = new List<CourseModule>();
+        public IReadOnlyCollection<CourseModule> Modules => _modules.AsReadOnly();
 
         public string Name { get; set; }
 
@@ -27,6 +31,14 @@ namespace TestDomain.Catalog
             Id = id;
             Name = name;
             Description = description;
+        }
+
+        public void AddModule(CourseModule module)
+        {
+            if (module == null)
+                throw new ArgumentNullException(nameof(module));
+
+            _modules.Add(module);
         }
     }
 }

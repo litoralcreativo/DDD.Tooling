@@ -18,6 +18,7 @@ namespace TestDomain.StudentManagment
 
 		public Address Address { get; set; }
 
+		private Course Course2 { get; set; } // ❌ DDD011: Student (StudentManagment) → Course (Catalog)
 		public Course Course { get; set; } // ❌ DDD011: Student (StudentManagment) → Course (Catalog)
 
 		public static Student Create(Guid studentId, string firstName, string lastName, Address address)

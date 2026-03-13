@@ -125,5 +125,14 @@ namespace DDD.Analyzers
 			defaultSeverity: DiagnosticSeverity.Error,
 			isEnabledByDefault: true,
 			description: "Los Value Objects pertenecen al BC que los define. Si necesitas su concepto en otro BC, crea tu propia representación local o muévelo a SharedKernel.");
+
+		public static readonly DiagnosticDescriptor CrossContextInternalUsage = new DiagnosticDescriptor(
+			id: "DDD012",
+			title: "Uso interno de tipo de otro Bounded Context",
+			messageFormat: "El campo privado '{0}' en '{1}' (BC: '{2}') usa el tipo '{3}' (BC: '{4}'). Considera reemplazarlo por el Id del tipo para reducir el acoplamiento entre BCs.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Info,
+			isEnabledByDefault: true,
+			description: "Los campos privados que usan tipos de otros BCs generan acoplamiento implícito. Aunque no es un error, considera usar solo el Id del tipo referenciado.");
 	}
 }

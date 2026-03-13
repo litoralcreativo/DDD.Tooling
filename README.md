@@ -47,15 +47,12 @@ DDD.Tooling/
 │       └── CrossBoundedContextReferenceCodeFixProvider.cs # Fix para DDD011
 └── TestDomain/                 # Proyecto de prueba
     ├── Catalog/
-    │   └── Course.cs
-    ├── StudentManagement/
+    │   ├── Course.cs
+    │   └── CourseModule.cs
+    ├── StudentManagment/
     │   └── Student.cs
-    ├── SharedKernel/
-    │   └── Address.cs
-    └── Examples/
-        ├── FactoryMethodExamples.cs
-        ├── InvalidValueObject.cs
-        └── ErrorExamples.cs
+    └── SharedKernel/
+        └── Address.cs
 ```
 
 ## 🔍 Reglas Implementadas
@@ -368,7 +365,8 @@ dotnet pack DDD.Analyzers/DDD.Analyzers.csproj
 El proyecto `TestDomain` contiene ejemplos de uso correcto e incorrecto, organizados por Bounded Context:
 
 - ✅ `Catalog/Course.cs` - AggregateRoot con `[BoundedContext("Catalog")]`
-- ✅ `StudentManagement/Student.cs` - AggregateRoot con referencias cruzadas (activa DDD011)
+- ✅ `Catalog/CourseModule.cs` - Entity interna del BC Catalog
+- ✅ `StudentManagment/Student.cs` - AggregateRoot con referencias cruzadas (activa DDD011)
 - ✅ `SharedKernel/Address.cs` - ValueObject con `[SharedKernel]`
 
 ## 📚 Documentación Adicional

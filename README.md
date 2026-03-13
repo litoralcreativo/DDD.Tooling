@@ -8,11 +8,12 @@ Proporcionar validación en tiempo de compilación de las reglas y patrones de D
 
 ## ✨ Características
 
-- ✅ **6 Analizadores** para validar reglas DDD (DDD001-DDD008)
-- ✅ **Quick Fixes (Code Fixes)** para corregir automáticamente warnings
+- ✅ **7 Analizadores** para validar reglas DDD (DDD001-DDD009)
+- ✅ **Quick Fixes (Code Fixes)** para corregir automáticamente errores/warnings
+- ✅ **Sugerencias educativas (Info)** para mejorar el diseño
 - ✅ **Manejo inteligente de tipos** (detecta automáticamente structs, nullables, referencias)
 - ✅ **Validación en tiempo real** en el IDE
-- ✅ **Errores y Warnings claros** con mensajes descriptivos
+- ✅ **Errores, Warnings e Infos claros** con mensajes descriptivos
 - ✅ **Fácil integración** vía NuGet (próximamente)
 
 ## 📦 Estructura del Proyecto
@@ -133,6 +134,55 @@ public class Money
 ### DDD006 - No puede ser AggregateRoot y ValueObject simultáneamente ❌ Error
 
 **Descripción**: Una clase no puede estar decorada con `[AggregateRoot]` y `[ValueObject]` al mismo tiempo.
+
+---
+
+### DDD009 - Entity debería usar Factory Method ℹ️ Info
+
+**Descripción**: Sugerencia educativa para usar Factory Methods en Entities/AggregateRoots con constructores públicos.
+
+**Este es un mensaje informativo**, no bloquea la compilación. Es una recomendación de buena práctica DDD.
+
+**Ejemplo que genera info:**
+
+```csharp
+[Entity]
+public class Product  // ℹ️ Sugerencia
+{
+    [EntityId]
+    public Guid Id { get; private set; }
+
+    public Product(string name)  // ⬅️ Constructor público
+    {
+        Id = Guid.NewGuid();
+        Name = name;
+    }
+}
+```
+
+**Ejemplo recomendado:**
+
+```csharp
+[Entity]
+public class Product
+{
+    [EntityId]
+    public Guid Id { get; private set; }
+
+    private Product() { }  // ✅ Constructor privado
+
+    public static Product Create(string name)  // ✅ Factory Method
+    {
+        return new Product
+        {
+            Id = Guid.NewGuid(),
+            Name = name
+        };
+    }
+}
+```
+
+**Ver documentación completa:** [DDD009_FACTORY_METHOD.md](DDD009_FACTORY_METHOD.md)
 
 ---
 

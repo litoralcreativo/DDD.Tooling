@@ -80,5 +80,14 @@ namespace DDD.Analyzers
 			defaultSeverity: DiagnosticSeverity.Warning,
 			isEnabledByDefault: true,
 			description: "Los Value Objects deben sobrescribir GetHashCode para mantener consistencia con Equals.");
+
+		public static readonly DiagnosticDescriptor EntityShouldUseFactoryMethod = new DiagnosticDescriptor(
+			id: "DDD009",
+			title: "Entity debería usar Factory Method",
+			messageFormat: "La clase '{0}' tiene constructor público. Considera usar un Factory Method estático (ej: Create) y hacer el constructor privado para mejor encapsulación.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Info,
+			isEnabledByDefault: true,
+			description: "Las Entities con constructores públicos pueden beneficiarse de Factory Methods para mejor control de creación y validación centralizada.");
 	}
 }

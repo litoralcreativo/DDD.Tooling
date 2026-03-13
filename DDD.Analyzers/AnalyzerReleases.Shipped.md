@@ -7,10 +7,11 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-DDD001 | Design | Error | Entity must have EntityId property - includes Code Fix
-DDD002 | Design | Error | AggregateRoot must have EntityId property - includes Code Fix
-DDD004 | Design | Warning | ValueObject must be immutable
-DDD005 | Design | Error | Cannot use multiple DDD attributes simultaneously
-DDD006 | Design | Error | Cannot be Entity and AggregateRoot simultaneously
-DDD007 | Design | Warning | ValueObject must override Equals - includes Code Fix
-DDD008 | Design | Warning | ValueObject must override GetHashCode - includes Code Fix
+DDD001 | DDD.Design | Error | Entity must have EntityId property
+DDD002 | DDD.Design | Error | AggregateRoot must have EntityId property
+DDD003 | DDD.Design | Error | EntityId attribute must only be applied to properties
+DDD004 | DDD.Design | Warning | ValueObject must be immutable
+DDD005 | DDD.Design | Error | Cannot use Entity and ValueObject simultaneously
+DDD006 | DDD.Design | Error | Cannot use AggregateRoot and ValueObject simultaneously
+DDD007 | DDD.Design | Warning | ValueObject must override Equals
+DDD008 | DDD.Design | Warning | ValueObject must override GetHashCode

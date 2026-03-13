@@ -4,6 +4,7 @@ using TestDomain.SharedKernel;
 
 namespace TestDomain.StudentManagment
 {
+	[BoundedContext("StudentManagment")]
 	[AggregateRoot]
 	public class Student
 	{

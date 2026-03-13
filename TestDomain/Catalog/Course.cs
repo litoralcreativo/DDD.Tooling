@@ -3,6 +3,7 @@ using System;
 
 namespace TestDomain.Catalog
 {
+    [BoundedContext("Catalog")]  // DDD010: 'Course' declara su Bounded Context
     [AggregateRoot]
     internal class Course
     {

@@ -2,6 +2,7 @@ using DDD.Abstractions;
 
 namespace TestDomain.SharedKernel
 {
+	[SharedKernel] // DDD010: 'Address' es un concepto compartido, por lo que se marca como SharedKernel
 	[ValueObject]
 	public class Address
 	{

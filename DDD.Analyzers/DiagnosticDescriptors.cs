@@ -89,5 +89,23 @@ namespace DDD.Analyzers
 			defaultSeverity: DiagnosticSeverity.Info,
 			isEnabledByDefault: true,
 			description: "Las Entities con constructores públicos pueden beneficiarse de Factory Methods para mejor control de creación y validación centralizada.");
+
+		public static readonly DiagnosticDescriptor DddTypeMustDeclareBoundedContext = new DiagnosticDescriptor(
+			id: "DDD010",
+			title: "Tipo DDD debe declarar su contexto",
+			messageFormat: "La clase '{0}' está decorada con [{1}] pero no declara su contexto. Usa [BoundedContext(\"NombreBC\")] si pertenece a un Bounded Context específico, o [SharedKernel] si es un concepto compartido.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Warning,
+			isEnabledByDefault: true,
+			description: "Las clases decoradas con [Entity], [AggregateRoot] o [ValueObject] deben declarar su contexto: [BoundedContext(\"NombreBC\")] para tipos de un BC específico, o [SharedKernel] para conceptos compartidos entre múltiples BCs.");
+
+		public static readonly DiagnosticDescriptor NoCrossContextDirectReference = new DiagnosticDescriptor(
+			id: "DDD011",
+			title: "No se pueden hacer referencias directas entre Bounded Contexts",
+			messageFormat: "La clase '{0}' (BC: '{1}') referencia directamente '{2}' (BC: '{3}'). Usa el Id en su lugar.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Error,
+			isEnabledByDefault: true,
+			description: "Las clases de distintos Bounded Contexts no deben referenciarse directamente. Usa el identificador (Id) del tipo en lugar de una referencia directa.");
 	}
 }

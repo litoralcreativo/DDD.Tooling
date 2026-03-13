@@ -436,7 +436,3 @@ Este proyecto está bajo la licencia **MIT**. Ver el archivo [LICENSE](LICENSE) 
 ## Contribuciones
 
 Las contribuciones son bienvenidas. Por favor, abre un issue antes de enviar un pull request.
-
----
-
-Hecho con ❤️ por [Gastón Chatelet](https://github.com/gastonchatelet) para mejorar el modelado de dominios en DDD

@@ -134,5 +134,14 @@ namespace DDD.Analyzers
 			defaultSeverity: DiagnosticSeverity.Warning,
 			isEnabledByDefault: true,
 			description: "Los campos privados que usan tipos de otros BCs generan acoplamiento implícito. Aunque no es un error, considera usar solo el Id del tipo referenciado.");
+
+		public static readonly DiagnosticDescriptor MultipleEntityIds = new DiagnosticDescriptor(
+			id: "DDD013",
+			title: "Entity/AggregateRoot no puede tener más de un [EntityId]",
+			messageFormat: "La clase '{0}' tiene {1} propiedades decoradas con [EntityId] ({2}). Una Entity o AggregateRoot debe tener exactamente un único identificador.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Error,
+			isEnabledByDefault: true,
+			description: "En DDD, una Entity o AggregateRoot se identifica por una única identidad. Tener múltiples [EntityId] es un anti-patrón: elige uno como identificador principal y elimina el atributo de los demás.");
 	}
 }

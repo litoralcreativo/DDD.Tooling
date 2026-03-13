@@ -9,3 +9,4 @@ DDD009 | DDD.Design | Info | Entity or AggregateRoot with public constructor sho
 DDD010 | DDD.Design | Warning | Entity/AggregateRoot/ValueObject must declare its Bounded Context
 DDD011 | DDD.Design | Error | No direct references between different Bounded Contexts
 DDD012 | DDD.Design | Warning | Internal private field/property uses a type from another Bounded Context
+DDD013 | DDD.Design | Error | Entity/AggregateRoot cannot have more than one [EntityId]

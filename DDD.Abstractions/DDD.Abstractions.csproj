@@ -2,6 +2,39 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+
+    <!-- NuGet packaging -->
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Identidad del paquete -->
+    <PackageId>DDD.Tooling.Abstractions</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Gaston Chatelet</Authors>
+    <Owners>Gaston Chatelet</Owners>
+    <Copyright>Copyright (c) 2026 Gaston Chatelet</Copyright>
+
+    <!-- Descripcion y etiquetas -->
+    <Description>Atributos base para Domain-Driven Design (DDD) en proyectos .NET: [Entity], [AggregateRoot], [ValueObject], [EntityId], [BoundedContext], [SharedKernel]. Companion package de DDD.Tooling.Analyzers.</Description>
+    <PackageTags>ddd;domain-driven-design;entity;aggregateroot;valueobject;bounded-context;attributes</PackageTags>
+    <PackageReleaseNotes>v1.0.0 - Primera version publica. Atributos DDD base.</PackageReleaseNotes>
+
+    <!-- Licencia y URLs -->
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageProjectUrl>https://github.com/litoralcreativo/DDD.Tooling</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/litoralcreativo/DDD.Tooling</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <!-- README visible en nuget.org -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <!-- README incluido en la raiz del paquete -->
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>

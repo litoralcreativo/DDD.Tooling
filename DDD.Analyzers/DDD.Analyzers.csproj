@@ -2,27 +2,41 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+
+    <!-- NuGet packaging -->
     <IsPackable>true</IsPackable>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>DDD.Analyzers</PackageId>
-    <PackageVersion>1.0.0.0</PackageVersion>
-    <Authors>DDD Tooling</Authors>
+    <!-- Identidad del paquete -->
+    <PackageId>DDD.Tooling.Analyzers</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Gaston Chatelet</Authors>
+    <Owners>Gaston Chatelet</Owners>
+    <Copyright>Copyright (c) 2026 Gaston Chatelet</Copyright>
+
+    <!-- Descripcion y etiquetas -->
+    <Description>Roslyn analyzers para validar reglas de Domain-Driven Design (DDD) en proyectos .NET. Incluye 13 reglas con Code Fixes automaticos para Entity, AggregateRoot, ValueObject y Bounded Contexts.</Description>
+    <PackageTags>ddd;domain-driven-design;roslyn;analyzer;codefix;entity;aggregateroot;valueobject;bounded-context</PackageTags>
+    <PackageReleaseNotes>v1.0.0 - Primera version publica. 13 reglas DDD, 7 Code Fix Providers.</PackageReleaseNotes>
+
+    <!-- Licencia y URLs -->
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/yourusername/DDD.Tooling</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/yourusername/DDD.Tooling</RepositoryUrl>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <Description>Analizadores Roslyn para validar reglas de Domain-Driven Design</Description>
-    <PackageReleaseNotes>Validación de reglas DDD en tiempo de compilación</PackageReleaseNotes>
-    <Copyright>Copyright</Copyright>
-    <PackageTags>DDD, Domain-Driven Design, Roslyn, Analyzers</PackageTags>
-    <DevelopmentDependency>true</DevelopmentDependency>
-    <NoPackageAnalysis>true</NoPackageAnalysis>
+    <PackageProjectUrl>https://github.com/litoralcreativo/DDD.Tooling</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/litoralcreativo/DDD.Tooling</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <!-- README visible en nuget.org -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <!-- Coloca los DLLs en la ruta correcta dentro del .nupkg -->
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddAnalyzersToOutput</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
@@ -33,13 +47,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DDD.Abstractions\DDD.Abstractions.csproj" />
+    <!-- PrivateAssets="all": no genera dependencia transitiva en el .nupkg -->
+    <ProjectReference Include="..\DDD.Abstractions\DDD.Abstractions.csproj" PrivateAssets="all" />
   </ItemGroup>
 
+  <!-- README incluido en la raiz del paquete -->
   <ItemGroup>
-    <None Update="tools\*.ps1" CopyToOutputDirectory="PreserveNewest" Pack="true" PackagePath="" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
+  <!-- Copia los DLLs a la ruta analyzers/dotnet/cs dentro del .nupkg -->
   <Target Name="_AddAnalyzersToOutput">
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(OutputPath)\DDD.Analyzers.dll" PackagePath="analyzers/dotnet/cs" />

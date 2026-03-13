@@ -7,222 +7,95 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
-## [1.3.0] - 2026-03-13
+## [Unreleased]
 
-### ✨ Agregado
-
-#### Tests unitarios (74 tests, 100% verdes)
-
-- **Fase 3** — Tests para todos los analizadores DDD001–DDD013 (55 tests)
-    - Stack: xUnit + `Microsoft.CodeAnalysis.CSharp.Analyzer.Testing v1.1.2`
-    - Cobertura completa de casos válidos e inválidos por regla
-    - Tests de diagnósticos DDD011 con `DiagnosticResult` explícito (múltiples descriptores comparten ID)
-
-- **Fase 4** — Tests de Code Fixes DDD001–DDD011 (19 tests)
-    - Stack: `Microsoft.CodeAnalysis.CSharp.CodeFix.Testing v1.1.2`
-    - Tests cubren: DDD001, DDD002, DDD003, DDD004 (×2), DDD005 (×2), DDD006 (×2), DDD007, DDD008, DDD009 (×2), DDD010 (×2), DDD011 (×2)
-
-### 🔧 Corregido
-
-- **`ValueObjectImmutabilityAnalyzer` (DDD004)**: los accessors `init` (`{ get; init; }`) ya **no** disparan DDD004 — son válidos en ValueObjects por ser inmutables tras la construcción
-- **`EntityIdCodeFixProvider` (DDD001/002)**: ahora agrega `using System;` automáticamente si `Guid` no está disponible en el archivo destino
-- **`EntityIdCodeFixProvider` (DDD001/002)**: corregido `InvalidOperationException` ("Sequence contains no matching element") al reemplazar clase cuando se agregan usings simultáneamente
-- **`ValueObjectMutabilityCodeFixProvider` (DDD005/006)**: al quitar un atributo de una lista compartida (e.g. `[Entity, ValueObject]`), ahora reconstruye la lista con `SyntaxFactory.SeparatedList` eliminando también el separador coma, evitando el artefacto `[Entity ]`
-
----
-
-## [1.1.0] - 2026-03-13
-
-### ✨ Agregado
-
-#### Atributos
-
-- **`[BoundedContext("Nombre")]`** - Marca la clase con el nombre de su Bounded Context
-- **`[SharedKernel]`** - Marca la clase como parte del Shared Kernel (accesible desde cualquier BC)
-
-#### Analizadores
-
-- **DDD009** - Entity/AggregateRoot debería usar Factory Method (Info)
-    - Detecta constructor público sin factory method estático
-    - Detecta factory method de instancia (no estático) que devuelve la clase
-    - El patrón correcto requiere: factory method estático público + constructor privado/internal
-    - Constructor `internal` + factory method estático = patrón válido (uso en mismo assembly)
-
-- **DDD010** - Entity/AggregateRoot/ValueObject debe declarar su Bounded Context (Warning)
-    - Detecta clases DDD sin `[BoundedContext]` ni `[SharedKernel]`
-    - Prerequisito obligatorio para que funcione la regla DDD011
-
-- **DDD011** - No referencias directas entre Bounded Contexts (Error)
-    - Detecta propiedades públicas que referencian tipos de otro BC
-    - Soporta tipos simples (`Course`) y colecciones genéricas (`List<Course>`, `IReadOnlyCollection<Course>`, etc.)
-    - Mensajes distintos según el tipo referenciado: AggregateRoot / Entity interna / ValueObject
-
-- **DDD012** - Miembro privado usa tipo de otro Bounded Context (Warning)
-    - Detecta campos y propiedades privadas/protegidas que referencian tipos de otro BC
-    - No tiene Code Fix (requiere decisión de diseño)
-
-#### Code Fixes
-
-- **DDD009** - `EntityFactoryMethodCodeFixProvider` con 3 escenarios:
-    - **Escenario 1**: Constructor público sin factory method → hace privado el constructor + agrega `Create` estático
-    - **Escenario 2**: Constructor privado/internal sin factory method estático → agrega `Create` estático
-    - **Escenario 3**: Método `Create` existente no estático → agrega modificador `static`
-
-- **DDD010** - `BoundedContextDeclarationCodeFixProvider`:
-    - Agrega `[BoundedContext("NombreBC")]` encima de la clase
-
-- **DDD011** - `CrossBoundedContextReferenceCodeFixProvider` con 2 casos:
-    - **Tipo simple**: `public Course Course { get; set; }` → `public Guid CourseId { get; set; }`
-    - **Colección genérica**: `public List<Course> Courses { get; set; }` → `public List<Guid> CourseIds { get; set; }`
-    - Infiere el tipo del Id desde el atributo `[EntityId]` (fallback: `Guid`)
-    - Elimina el `using` huérfano del BC referenciado si ya no es necesario
-    - Agrega `using System` si falta (para `Guid`)
-
-#### TestDomain reorganizado
-
-- Reorganizado en carpetas por Bounded Context: `Catalog/`, `StudentManagement/`, `SharedKernel/`
-- `Course.cs` → `Catalog/` con `[BoundedContext("Catalog")]`
-- `Student.cs` → `StudentManagement/` con `[BoundedContext("StudentManagement")]`
-- `Address.cs` → `SharedKernel/` con `[SharedKernel]`
-
-#### Documentación
-
-- 📖 `README.md` - Documentación principal
-- ️🗺️ `ROADMAP.md` - Roadmap del proyecto
-- 📋 `CHANGELOG.md` - Este archivo
-- 🎬 `DEMO.md` - Demo completo con ejemplos
-- 🚀 `QUICKSTART.md` - Guía rápida de inicio
-
-### 🔧 Cambiado
-
-- Lógica del analizador DDD009: el patrón correcto ahora requiere **ambas** condiciones: factory method estático **Y** constructor no público (no solo una de las dos)
-- Renombrado `DddAttributeConflictsAnalyzer` → `DddAttributeUsageAnalyzer` (refleja mejor que detecta DDD003, DDD005 y DDD006)
-
----
-
-## [1.0.0] - 2026-03-12
-
-### ✨ Agregado
-
-#### Analizadores
-
-- **DDD001** - Entity debe tener EntityId (Error)
-- **DDD002** - AggregateRoot debe tener EntityId (Error)
-- **DDD004** - ValueObject debe ser inmutable (Warning)
-- **DDD005** - No usar múltiples atributos DDD (Error)
-- **DDD006** - No usar Entity y AggregateRoot juntos (Error)
-- **DDD007** - ValueObject debe sobrescribir Equals (Warning)
-- **DDD008** - ValueObject debe sobrescribir GetHashCode (Warning)
-
-#### Code Fixes (Quick Fixes)
-
-- **DDD001/DDD002** - Agregar propiedad Id con [EntityId] automáticamente
-    - Genera propiedad `public Guid Id { get; private set; }`
-    - Agrega atributo `[EntityId]` automáticamente
-    - Agrega `using DDD.Abstractions` si no existe
-    - Posiciona la propiedad al inicio de la clase
-- **DDD007/DDD008** - Agregar Equals y GetHashCode automáticamente
-    - Manejo inteligente de tipos:
-        - Value types (int, decimal, DateTime) → sin operador `?.`
-        - Nullable types (int?, decimal?) → con operador `?.`
-        - Reference types (string, classes) → con operador `?.`
-    - Genera comparaciones para todas las propiedades públicas
-    - Implementa hash code correcto con algoritmo seguro
-
-#### Atributos DDD
-
-- `[Entity]` - Marca clases como entidades
-- `[EntityId]` - Marca propiedades como identificadores
-- `[AggregateRoot]` - Marca clases como aggregate roots
-- `[ValueObject]` - Marca clases como value objects
-
-#### Infraestructura
-
-- Script PowerShell `reload-analyzers.ps1` para recargar analizadores
-- Configuración `.editorconfig` para el proyecto
-- `.gitignore` completo para proyectos .NET
-- Soporte para netstandard2.0 (compatible con .NET Framework 4.7.2+)
-
-#### Documentación
-
-- 📖 `README.md` - Documentación principal
-- ️ `ROADMAP.md` - Roadmap del proyecto
-- � `CHANGELOG.md` - Este archivo
-- 🎬 `DEMO.md` - Demo completo con ejemplos
-- � `QUICKSTART.md` - Guía rápida de inicio
-
-#### Ejemplos
-
-- `TestDomain/Currency.cs` - ValueObject completo con validaciones
-- `TestDomain/Address.cs` - ValueObject simple
-- `TestDomain/Student.cs` - Entity con EntityId
-- `TestDomain/Course.cs` - AggregateRoot con EntityId
-- `TestDomain/Examples/Price.cs` - ValueObject con tipos mixtos
-- `TestDomain/Examples/MissingEntityId.cs` - Entities sin EntityId para probar Code Fix
-- `TestDomain/Examples/InvalidValueObject.cs` - Ejemplos de errores
-- `TestDomain/Examples/IncompleteValueObject.cs` - Para testing
-
-### 🔧 Cambiado
-
-- Migrado de C# 9 records a classes para compatibilidad con netstandard2.0
-- Mejorado generación de GetHashCode para manejar diferentes tipos correctamente
-
-### 🐛 Corregido
-
-- Error CS0023 cuando se usaba `?.` con tipos de valor (decimal, int, etc.)
-- Warning RS1036 agregando `EnforceExtendedAnalyzerRules=true`
-- Problemas con recarga de analizadores en VS Code
-
-### 🧹 Limpieza
-
-- Removidos 84 archivos de build (bin/, obj/, .vs/)
-- Agregado `.gitignore` completo
-- Limpieza de repositorio Git
-
----
-
-## [Unreleased] - Próximas versiones
-
-### 🎯 Planeado para v2.0.0
-
-#### Packaging
-
-- Publicar `DDD.Tooling.Abstractions` en NuGet.org
-- Publicar `DDD.Tooling.Analyzers` en NuGet.org
+### 🎯 Planeado para v1.1.0
 
 #### CI/CD
 
 - GitHub Actions para build + test en cada PR
-- GitHub Actions para publicar NuGet en cada release
+- GitHub Actions para publicar NuGet automáticamente en cada release tag
 
 ---
 
-## 📊 Estadísticas de la Versión Actual
+## [1.0.0] - 2026-03-13
 
-### v1.3.0
+Primera release pública. Publicada en NuGet.org como:
 
-- **Analizadores**: 8 clases, 13 reglas (DDD001-DDD013)
-- **Code Fixes**: 7 providers
-    - `EntityIdCodeFixProvider` (DDD001/002)
-    - `EntityIdOnPropertyCodeFixProvider` (DDD003)
-    - `ValueObjectMutabilityCodeFixProvider` (DDD004/005/006)
-    - `ValueObjectEqualsCodeFixProvider` (DDD007/008)
-    - `EntityFactoryMethodCodeFixProvider` (DDD009)
-    - `BoundedContextDeclarationCodeFixProvider` (DDD010)
-    - `CrossBoundedContextReferenceCodeFixProvider` (DDD011)
-- **Tests unitarios**: 74 (55 analyzer + 19 codefix), 100% verdes
-- **Atributos**: 6 (Entity, EntityId, AggregateRoot, ValueObject, BoundedContext, SharedKernel)
-- **Ejemplos**: 3 BCs en TestDomain (Catalog, StudentManagement, SharedKernel)
-- **Documentación**: 12+ archivos markdown
+- [`DDD.Tooling.Abstractions`](https://www.nuget.org/packages/DDD.Tooling.Abstractions)
+- [`DDD.Tooling.Analyzers`](https://www.nuget.org/packages/DDD.Tooling.Analyzers)
+
+### ✨ Agregado
+
+#### Atributos DDD (`DDD.Tooling.Abstractions`)
+
+- `[Entity]` — Marca clases como entidades DDD
+- `[EntityId]` — Marca propiedades como identificadores de entidad
+- `[AggregateRoot]` — Marca clases como aggregate roots
+- `[ValueObject]` — Marca clases como value objects
+- `[BoundedContext("Nombre")]` — Declara el Bounded Context al que pertenece la clase
+- `[SharedKernel]` — Marca la clase como parte del Shared Kernel (accesible desde cualquier BC)
+
+#### Analizadores (`DDD.Tooling.Analyzers`)
+
+- **DDD001** — Entity debe tener una propiedad con `[EntityId]` (Error)
+- **DDD002** — AggregateRoot debe tener una propiedad con `[EntityId]` (Error)
+- **DDD003** — `[EntityId]` solo puede aplicarse a propiedades (Error)
+- **DDD004** — ValueObject debe ser inmutable; setters públicos no están permitidos (Warning)
+    - Los accessors `init` (`{ get; init; }`) son válidos — inmutables tras construcción
+- **DDD005** — Una clase no puede ser `[Entity]` y `[ValueObject]` simultáneamente (Error)
+- **DDD006** — Una clase no puede ser `[AggregateRoot]` y `[ValueObject]` simultáneamente (Error)
+- **DDD007** — ValueObject debe sobrescribir `Equals` (Warning)
+- **DDD008** — ValueObject debe sobrescribir `GetHashCode` (Warning)
+- **DDD009** — Entity/AggregateRoot debería usar Factory Method (Info)
+    - Detecta constructor público sin factory method estático
+    - El patrón correcto requiere: factory method `static` público + constructor `private`/`internal`
+- **DDD010** — Entity/AggregateRoot/ValueObject debe declarar su Bounded Context (Warning)
+    - Prerequisito para que funcione DDD011
+- **DDD011** — No referencias directas entre Bounded Contexts (Error)
+    - Soporta tipos simples y colecciones genéricas (`List<T>`, `IReadOnlyCollection<T>`, etc.)
+- **DDD012** — Miembro privado usa tipo de otro Bounded Context (Warning)
+- **DDD013** — Entity/AggregateRoot no puede tener más de un `[EntityId]` (Error)
+
+#### Code Fixes
+
+- **DDD001/002** — `EntityIdCodeFixProvider`: agrega propiedad `public Guid Id { get; private set; }` con `[EntityId]`; agrega `using System;` y `using DDD.Abstractions;` si faltan
+- **DDD003** — `EntityIdOnPropertyCodeFixProvider`: mueve `[EntityId]` a la propiedad correcta
+- **DDD004/005/006** — `ValueObjectMutabilityCodeFixProvider`:
+    - DDD004: convierte setter público en `private set`
+    - DDD005/006: elimina el atributo conflictivo de la clase
+- **DDD007/008** — `ValueObjectEqualsCodeFixProvider`: genera `Equals` y `GetHashCode` con manejo inteligente de tipos (value types, nullables, reference types)
+- **DDD009** — `EntityFactoryMethodCodeFixProvider` con 3 escenarios:
+    - Constructor público sin factory method → hace privado el constructor + agrega `Create` estático
+    - Constructor privado/internal sin factory method → agrega `Create` estático
+    - Método `Create` existente no estático → agrega modificador `static`
+- **DDD010** — `BoundedContextDeclarationCodeFixProvider`: agrega `[BoundedContext("NombreBC")]`
+- **DDD011** — `CrossBoundedContextReferenceCodeFixProvider`:
+    - Tipo simple: `public Course Course` → `public Guid CourseId`
+    - Colección: `public List<Course> Courses` → `public List<Guid> CourseIds`
+    - Infiere el tipo de Id desde `[EntityId]`; elimina `using` huérfano
+
+#### Tests
+
+- **74 tests unitarios** (100% verdes)
+    - 55 tests de analizadores (DDD001–DDD013) con `Microsoft.CodeAnalysis.CSharp.Analyzer.Testing v1.1.2`
+    - 19 tests de Code Fixes (DDD001–DDD011) con `Microsoft.CodeAnalysis.CSharp.CodeFix.Testing v1.1.2`
+
+#### Infraestructura
+
+- Target MSBuild `_AddAnalyzersToOutput`: coloca los DLLs en `analyzers/dotnet/cs/` dentro del `.nupkg`
+- `DevelopmentDependency=true`: el paquete no genera dependencia transitiva en proyectos consumidores
+- Soporte para `netstandard2.0` (compatible con .NET Framework 4.7.2+)
+- Script PowerShell `reload-analyzers.ps1` para recargar analizadores en VS Code
 
 ---
 
 ## 🔗 Enlaces
 
-- **Repositorio**: [GitHub](https://github.com/tu-usuario/DDD.Tooling) _(pendiente)_
-- **NuGet Package**: _(pendiente)_
-- **Issues**: [GitHub Issues](https://github.com/tu-usuario/DDD.Tooling/issues) _(pendiente)_
-- **Wiki**: [GitHub Wiki](https://github.com/tu-usuario/DDD.Tooling/wiki) _(pendiente)_
+- **Repositorio**: [github.com/litoralcreativo/DDD.Tooling](https://github.com/litoralcreativo/DDD.Tooling)
+- **NuGet — Abstractions**: [DDD.Tooling.Abstractions](https://www.nuget.org/packages/DDD.Tooling.Abstractions)
+- **NuGet — Analyzers**: [DDD.Tooling.Analyzers](https://www.nuget.org/packages/DDD.Tooling.Analyzers)
+- **Issues**: [github.com/litoralcreativo/DDD.Tooling/issues](https://github.com/litoralcreativo/DDD.Tooling/issues)
 
 ---
 
@@ -230,16 +103,9 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 Este proyecto usa [Semantic Versioning](https://semver.org/):
 
-- **MAJOR** (X.0.0) - Cambios incompatibles con versiones anteriores
-- **MINOR** (0.X.0) - Nueva funcionalidad compatible con versiones anteriores
-- **PATCH** (0.0.X) - Correcciones de bugs compatibles con versiones anteriores
-
-### Ejemplos:
-
-- Nuevo analizador → MINOR version
-- Cambiar severidad de Error a Warning → MAJOR version
-- Fix de bug en Code Fix → PATCH version
-- Nueva documentación → PATCH version
+- **MAJOR** (X.0.0) — Cambios incompatibles con versiones anteriores (ej: cambiar severidad de Error a Warning)
+- **MINOR** (0.X.0) — Nueva funcionalidad compatible (ej: nuevo analizador)
+- **PATCH** (0.0.X) — Correcciones de bugs (ej: fix en un Code Fix, nueva documentación)
 
 ---
 
@@ -247,13 +113,12 @@ Este proyecto usa [Semantic Versioning](https://semver.org/):
 
 Usamos [Conventional Commits](https://www.conventionalcommits.org/):
 
-- `feat:` - Nueva funcionalidad
-- `fix:` - Corrección de bug
-- `docs:` - Cambios en documentación
-- `style:` - Formato, falta de punto y coma, etc.
-- `refactor:` - Refactorización de código
-- `test:` - Agregar tests
-- `chore:` - Actualización de tareas de build, etc.
+- `feat:` — Nueva funcionalidad
+- `fix:` — Corrección de bug
+- `docs:` — Cambios en documentación
+- `test:` — Agregar o modificar tests
+- `refactor:` — Refactorización sin cambio de comportamiento
+- `chore:` — Tareas de build, CI, packaging
 
 ---
 

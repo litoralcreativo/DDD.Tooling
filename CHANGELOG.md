@@ -11,6 +11,11 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ### ✨ Agregado
 
+#### Atributos
+
+- **`[BoundedContext("Nombre")]`** - Marca la clase con el nombre de su Bounded Context
+- **`[SharedKernel]`** - Marca la clase como parte del Shared Kernel (accesible desde cualquier BC)
+
 #### Analizadores
 
 - **DDD009** - Entity/AggregateRoot debería usar Factory Method (Info)
@@ -19,6 +24,19 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
     - El patrón correcto requiere: factory method estático público + constructor privado/internal
     - Constructor `internal` + factory method estático = patrón válido (uso en mismo assembly)
 
+- **DDD010** - Entity/AggregateRoot/ValueObject debe declarar su Bounded Context (Warning)
+    - Detecta clases DDD sin `[BoundedContext]` ni `[SharedKernel]`
+    - Prerequisito obligatorio para que funcione la regla DDD011
+
+- **DDD011** - No referencias directas entre Bounded Contexts (Error)
+    - Detecta propiedades públicas que referencian tipos de otro BC
+    - Soporta tipos simples (`Course`) y colecciones genéricas (`List<Course>`, `IReadOnlyCollection<Course>`, etc.)
+    - Mensajes distintos según el tipo referenciado: AggregateRoot / Entity interna / ValueObject
+
+- **DDD012** - Miembro privado usa tipo de otro Bounded Context (Warning)
+    - Detecta campos y propiedades privadas/protegidas que referencian tipos de otro BC
+    - No tiene Code Fix (requiere decisión de diseño)
+
 #### Code Fixes
 
 - **DDD009** - `EntityFactoryMethodCodeFixProvider` con 3 escenarios:
@@ -26,13 +44,35 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
     - **Escenario 2**: Constructor privado/internal sin factory method estático → agrega `Create` estático
     - **Escenario 3**: Método `Create` existente no estático → agrega modificador `static`
 
-#### Ejemplos
+- **DDD010** - `BoundedContextDeclarationCodeFixProvider`:
+    - Agrega `[BoundedContext("NombreBC")]` encima de la clase
 
-- `TestDomain/Examples/FactoryMethodExamples.cs` - Ejemplos de los distintos casos de DDD009
+- **DDD011** - `CrossBoundedContextReferenceCodeFixProvider` con 2 casos:
+    - **Tipo simple**: `public Course Course { get; set; }` → `public Guid CourseId { get; set; }`
+    - **Colección genérica**: `public List<Course> Courses { get; set; }` → `public List<Guid> CourseIds { get; set; }`
+    - Infiere el tipo del Id desde el atributo `[EntityId]` (fallback: `Guid`)
+    - Elimina el `using` huérfano del BC referenciado si ya no es necesario
+    - Agrega `using System` si falta (para `Guid`)
+
+#### TestDomain reorganizado
+
+- Reorganizado en carpetas por Bounded Context: `Catalog/`, `StudentManagement/`, `SharedKernel/`
+- `Course.cs` → `Catalog/` con `[BoundedContext("Catalog")]`
+- `Student.cs` → `StudentManagement/` con `[BoundedContext("StudentManagement")]`
+- `Address.cs` → `SharedKernel/` con `[SharedKernel]`
+
+#### Documentación
+
+- 📖 `README.md` - Documentación principal
+- ️🗺️ `ROADMAP.md` - Roadmap del proyecto
+- 📋 `CHANGELOG.md` - Este archivo
+- 🎬 `DEMO.md` - Demo completo con ejemplos
+- 🚀 `QUICKSTART.md` - Guía rápida de inicio
 
 ### 🔧 Cambiado
 
 - Lógica del analizador DDD009: el patrón correcto ahora requiere **ambas** condiciones: factory method estático **Y** constructor no público (no solo una de las dos)
+- Renombrado `DddAttributeConflictsAnalyzer` → `DddAttributeUsageAnalyzer` (refleja mejor que detecta DDD003, DDD005 y DDD006)
 
 ---
 
@@ -82,16 +122,10 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 #### Documentación
 
 - 📖 `README.md` - Documentación principal
-- 🚀 `QUICKSTART.md` - Guía rápida de inicio
-- 🔧 `QUICKFIX_GUIDE.md` - Guía de Quick Fixes
-- 🆔 `ENTITYID_CODEFIX.md` - Guía del Code Fix para EntityId
-- 🔍 `TYPE_HANDLING.md` - Manejo inteligente de tipos
-- 🗺️ `ROADMAP.md` - Roadmap del proyecto
-- 📝 `SUMMARY.md` - Resumen de analizadores
+- ️ `ROADMAP.md` - Roadmap del proyecto
+- � `CHANGELOG.md` - Este archivo
 - 🎬 `DEMO.md` - Demo completo con ejemplos
-- 🔄 `ANALYZER_RELOAD.md` - Cómo recargar analizadores
-- 📋 `CHANGELOG.md` - Este archivo
-- 🧹 `GIT_CLEANUP.md` - Guía de limpieza de Git
+- � `QUICKSTART.md` - Guía rápida de inicio
 
 #### Ejemplos
 
@@ -127,12 +161,6 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ### 🎯 Planeado para v1.2.0
 
-#### Analizadores
-
-- **DDD010** - AggregateRoot no debe exponer colecciones mutables (`List<T>` → `IReadOnlyCollection<T>`)
-- **DDD011** - Domain Events solo en AggregateRoots
-- **DDD012** - Repository pattern validation
-
 #### Code Fixes
 
 - **DDD004** - Convertir setter público a privado/init
@@ -151,15 +179,16 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ### v1.1.0
 
-- **Analizadores**: 9 reglas (DDD001-DDD009)
-- **Code Fixes**: 3 providers
+- **Analizadores**: 7 clases, 12 reglas (DDD001-DDD012)
+- **Code Fixes**: 5 providers
     - `EntityIdCodeFixProvider` (DDD001/002)
     - `ValueObjectEqualsCodeFixProvider` (DDD007/008)
     - `EntityFactoryMethodCodeFixProvider` (DDD009)
-- **Atributos**: 4 (Entity, EntityId, AggregateRoot, ValueObject)
-- **Ejemplos**: 5 archivos de ejemplo en TestDomain
+    - `BoundedContextDeclarationCodeFixProvider` (DDD010)
+    - `CrossBoundedContextReferenceCodeFixProvider` (DDD011)
+- **Atributos**: 6 (Entity, EntityId, AggregateRoot, ValueObject, BoundedContext, SharedKernel)
+- **Ejemplos**: 3 BCs en TestDomain (Catalog, StudentManagement, SharedKernel)
 - **Documentación**: 12+ archivos markdown
-- **Líneas de código**: ~2,500 líneas
 
 ---
 

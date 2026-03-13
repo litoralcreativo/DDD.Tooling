@@ -8,10 +8,12 @@ Proporcionar validación en tiempo de compilación de las reglas y patrones de D
 
 ## ✨ Características
 
-- ✅ **9 Analizadores** para validar reglas DDD (DDD001-DDD009)
-- ✅ **3 Code Fix Providers** para corregir automáticamente errores/warnings
+- ✅ **12 Reglas** de análisis DDD (DDD001-DDD012)
+- ✅ **5 Code Fix Providers** para corregir automáticamente errores/warnings
 - ✅ **Sugerencias educativas (Info)** para mejorar el diseño
 - ✅ **Manejo inteligente de tipos** (detecta automáticamente structs, nullables, referencias)
+- ✅ **Detección de referencias cruzadas** entre Bounded Contexts (DDD010-DDD012)
+- ✅ **Soporte para colecciones genéricas** (`List<T>`, `IReadOnlyCollection<T>`, etc.)
 - ✅ **Validación en tiempo real** en el IDE
 - ✅ **Errores, Warnings e Infos claros** con mensajes descriptivos
 - ✅ **Fácil integración** vía NuGet (próximamente)
@@ -25,22 +27,31 @@ DDD.Tooling/
 │       ├── EntityAttribute.cs
 │       ├── EntityIdAttribute.cs
 │       ├── AggregateRootAttribute.cs
-│       └── ValueObjectAttribute.cs
+│       ├── ValueObjectAttribute.cs
+│       ├── BoundedContextAttribute.cs
+│       └── SharedKernelAttribute.cs
 ├── DDD.Analyzers/              # Analizadores Roslyn
 │   ├── DiagnosticDescriptors.cs
-│   ├── EntityMustHaveEntityIdAnalyzer.cs       # DDD001
-│   ├── AggregateRootMustHaveEntityIdAnalyzer.cs # DDD002
-│   ├── ValueObjectImmutabilityAnalyzer.cs      # DDD004
-│   ├── DddAttributeConflictsAnalyzer.cs        # DDD005/006/007/008
-│   ├── EntityFactoryMethodAnalyzer.cs          # DDD009
+│   ├── EntityMustHaveEntityIdAnalyzer.cs             # DDD001
+│   ├── AggregateRootMustHaveEntityIdAnalyzer.cs      # DDD002
+│   ├── ValueObjectImmutabilityAnalyzer.cs            # DDD004, DDD007, DDD008
+│   ├── DddAttributeUsageAnalyzer.cs                  # DDD003, DDD005, DDD006
+│   ├── EntityFactoryMethodAnalyzer.cs                # DDD009
+│   ├── BoundedContextDeclarationAnalyzer.cs          # DDD010
+│   ├── CrossBoundedContextReferenceAnalyzer.cs       # DDD011, DDD012
 │   └── CodeFixes/
-│       ├── EntityIdCodeFixProvider.cs          # Fix para DDD001/002
-│       ├── ValueObjectEqualsCodeFixProvider.cs # Fix para DDD007/008
-│       └── EntityFactoryMethodCodeFixProvider.cs # Fix para DDD009
+│       ├── EntityIdCodeFixProvider.cs                # Fix para DDD001/002
+│       ├── ValueObjectEqualsCodeFixProvider.cs       # Fix para DDD007/008
+│       ├── EntityFactoryMethodCodeFixProvider.cs     # Fix para DDD009
+│       ├── BoundedContextDeclarationCodeFixProvider.cs # Fix para DDD010
+│       └── CrossBoundedContextReferenceCodeFixProvider.cs # Fix para DDD011
 └── TestDomain/                 # Proyecto de prueba
-    ├── Course.cs
-    ├── Student.cs
-    ├── Address.cs
+    ├── Catalog/
+    │   └── Course.cs
+    ├── StudentManagement/
+    │   └── Student.cs
+    ├── SharedKernel/
+    │   └── Address.cs
     └── Examples/
         ├── FactoryMethodExamples.cs
         ├── InvalidValueObject.cs
@@ -209,6 +220,76 @@ public class Product
 
 ---
 
+### DDD010 - Entity/AggregateRoot/ValueObject debe declarar su Bounded Context ⚠️ Warning
+
+**Descripción**: Todas las clases DDD deben estar decoradas con `[BoundedContext("NombreBC")]` o `[SharedKernel]` para indicar a qué Bounded Context pertenecen. Esto es el prerequisito para que funcione DDD011.
+
+**Quick Fix disponible**: Agrega `[BoundedContext("NombreBC")]` encima de la clase.
+
+```csharp
+[AggregateRoot]
+// ⚠️ DDD010: Falta declarar el Bounded Context
+public class Course { ... }
+
+// ✅ Correcto:
+[AggregateRoot]
+[BoundedContext("Catalog")]
+public class Course { ... }
+```
+
+---
+
+### DDD011 - No referencias directas entre Bounded Contexts ❌ Error
+
+**Descripción**: Una clase de un BC no puede tener propiedades públicas que referencien directamente tipos de otro BC. Se deben usar los identificadores (IDs) en su lugar.
+
+**Quick Fix disponible** (2 casos):
+
+- **Tipo simple**: `public Course Course { get; set; }` → `public Guid CourseId { get; set; }`
+- **Colección genérica**: `public List<Course> Courses { get; set; }` → `public List<Guid> CourseIds { get; set; }`
+
+El mensaje varía según el tipo referenciado:
+
+- **AggregateRoot** → "usa el `CourseId` (el identificador del agregado)"
+- **Entity interna** → "las entidades internas no deben exponerse fuera del BC"
+- **ValueObject** → "los value objects deben copiarse o abstraerse en el BC destino"
+
+```csharp
+[AggregateRoot]
+[BoundedContext("StudentManagement")]
+public class Student
+{
+    [EntityId]
+    public Guid Id { get; private set; }
+
+    public Course Course { get; set; }            // ❌ DDD011 Error
+    public List<Course> Courses { get; set; }     // ❌ DDD011 Error (genérico)
+
+    public Guid CourseId { get; set; }            // ✅ Correcto: solo el Id
+    public List<Guid> CourseIds { get; set; }     // ✅ Correcto: colección de Ids
+}
+```
+
+---
+
+### DDD012 - Miembro privado usa tipo de otro Bounded Context ⚠️ Warning
+
+**Descripción**: Campos y propiedades privadas/protegidas que referencian tipos de otro BC. Menos severo que DDD011 (privados no forman parte del contrato público), pero aún es una dependencia a revisar.
+
+> ⚠️ No tiene Code Fix asociado — requiere decisión de diseño por parte del desarrollador.
+
+```csharp
+[AggregateRoot]
+[BoundedContext("StudentManagement")]
+public class Student
+{
+    private Course _currentCourse;          // ⚠️ DDD012 Warning
+    private List<Course> _history;          // ⚠️ DDD012 Warning
+}
+```
+
+---
+
 ## 🚀 Uso
 
 ### 1. Instalar las abstracciones
@@ -284,39 +365,37 @@ dotnet pack DDD.Analyzers/DDD.Analyzers.csproj
 
 ## 📝 Ejemplos en TestDomain
 
-El proyecto `TestDomain` contiene ejemplos de uso correcto e incorrecto:
+El proyecto `TestDomain` contiene ejemplos de uso correcto e incorrecto, organizados por Bounded Context:
 
-- ✅ `Course.cs` - Entity correcto con EntityId
-- ✅ `Student.cs` - AggregateRoot correcto
-- ✅ `Address.cs` - ValueObject inmutable correcto
-- ⚠️ `InvalidValueObject.cs` - ValueObject con setter público (genera warning)
+- ✅ `Catalog/Course.cs` - AggregateRoot con `[BoundedContext("Catalog")]`
+- ✅ `StudentManagement/Student.cs` - AggregateRoot con referencias cruzadas (activa DDD011)
+- ✅ `SharedKernel/Address.cs` - ValueObject con `[SharedKernel]`
 
 ## 📚 Documentación Adicional
 
-- 📖 [QUICKSTART.md](QUICKSTART.md) - Guía rápida de inicio
-- 🔧 [QUICKFIX_GUIDE.md](QUICKFIX_GUIDE.md) - Cómo usar los Quick Fixes
-- 🔍 [TYPE_HANDLING.md](TYPE_HANDLING.md) - Manejo inteligente de tipos en Code Fixes
+- 🚀 [QUICKSTART.md](QUICKSTART.md) - Guía rápida de inicio
 - 🗺️ [ROADMAP.md](ROADMAP.md) - Roadmap del proyecto
-- � [SUMMARY.md](SUMMARY.md) - Resumen de analizadores
-- 🎬 [DEMO.md](DEMO.md) - Demo completo
-- 🔄 [ANALYZER_RELOAD.md](ANALYZER_RELOAD.md) - Cómo recargar analizadores
-- �📚 `ErrorExamples.cs` - Ejemplos comentados de errores
+- 🎬 [DEMO.md](DEMO.md) - Demo completo con ejemplos
+- 📋 [CHANGELOG.md](CHANGELOG.md) - Historial de cambios
 
 ## 🎯 Próximas Reglas a Implementar
 
-- [ ] DDD010 - AggregateRoot no debe exponer colecciones mutables (`List<T>` → `IReadOnlyCollection<T>`)
-- [ ] DDD011 - Domain Events solo en AggregateRoot
 - [ ] Code Fix para DDD004 - Convertir setters públicos a privados/init
+- [ ] Code Fix para DDD005/006 - Remover atributos conflictivos
 - [ ] Tests unitarios para todos los analizadores
 
 ## 📄 Licencia
 
-MIT
+Este proyecto está bajo la licencia **MIT**. Ver el archivo [LICENSE](LICENSE) para más detalles.
 
-## 👥 Contribuciones
+## 👤 Autor
+
+**Gastón Chatelet** — Creador y mantenedor principal del proyecto.
+
+## Contribuciones
 
 Las contribuciones son bienvenidas. Por favor, abre un issue antes de enviar un pull request.
 
 ---
 
-Hecho con ❤️ para mejorar el modelado de dominios en DDD
+Hecho con ❤️ por [Gastón Chatelet](https://github.com/gastonchatelet) para mejorar el modelado de dominios en DDD

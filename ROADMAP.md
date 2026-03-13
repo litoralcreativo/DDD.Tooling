@@ -14,8 +14,22 @@
     - [x] Code Fix: genera `Equals` con comparación de todas las propiedades
 - [x] **DDD008** - ValueObject debe sobrescribir GetHashCode ⚠️ Warning
     - [x] Code Fix: genera `GetHashCode` con manejo inteligente de tipos
+
+## ✅ Implementado (v1.1)
+
 - [x] **DDD009** - Entity/AggregateRoot debería usar Factory Method ℹ️ Info
     - [x] Code Fix (3 escenarios): hacer constructor privado + agregar `Create` estático / agregar `static` a método existente
+- [x] **DDD010** - Entity/AggregateRoot/ValueObject debe declarar su Bounded Context ⚠️ Warning
+    - [x] Code Fix: agrega `[BoundedContext("NombreBC")]` automáticamente
+    - [x] Soporte para `[SharedKernel]` como alternativa
+- [x] **DDD011** - No referencias directas entre Bounded Contexts ❌ Error
+    - [x] Mensajes diferenciados: AggregateRoot / Entity interna / ValueObject
+    - [x] Soporte para colecciones genéricas (`List<T>`, `IReadOnlyCollection<T>`, etc.)
+    - [x] Code Fix: tipo simple (`Course` → `Guid CourseId`) y colección (`List<Course>` → `List<Guid> CourseIds`)
+    - [x] Code Fix elimina `using` huérfano y agrega `using System` si falta
+- [x] **DDD012** - Miembro privado usa tipo de otro Bounded Context ⚠️ Warning
+    - [x] Detecta campos y propiedades privadas/protegidas
+    - [ ] Code Fix: sin fix por decisión de diseño (requiere juicio del desarrollador)
 
 ## 🚧 Próximas Implementaciones
 
@@ -25,42 +39,6 @@
 - [ ] **Code Fix para DDD005/DDD006**: Ofrecer remover uno de los atributos conflictivos
 
 ### Fase 3 - Analizadores Adicionales
-
-#### DDD010 - AggregateRoot no debe exponer colecciones mutables
-
-```csharp
-[AggregateRoot]
-public class Order
-{
-    [EntityId]
-    public Guid Id { get; private set; }
-
-    public List<OrderItem> Items { get; set; }  // ❌ Error: No exponer List<T> directamente
-
-    // ✅ Correcto: IReadOnlyCollection<OrderItem>
-}
-```
-
-#### DDD011 - Domain Events solo en AggregateRoot
-
-```csharp
-[Entity]
-public class OrderItem
-{
-    public void RaiseDomainEvent() { }  // ❌ Warning: Solo AggregateRoot debe lanzar eventos
-}
-```
-
-#### DDD012 - Validar nombres de EntityId
-
-```csharp
-[Entity]
-public class Product
-{
-    [EntityId]
-    public Guid Identifier { get; private set; }  // ⚠️ Warning: Considere usar 'ProductId' o 'Id'
-}
-```
 
 #### DDD013 - Repository pattern
 

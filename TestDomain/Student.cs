@@ -16,7 +16,9 @@ namespace TestDomain
 		public string LastName { get; set; }
 		public DateTime EnrollmentDate { get; private set; }
 
-		public Student(Guid studentId, string firstName, string lastName)
+		public Address Address { get; set; }
+
+		public Student(Guid studentId, string firstName, string lastName, Address address)
 		{
 			StudentId = studentId;
 			FirstName = firstName;

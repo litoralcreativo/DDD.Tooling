@@ -18,7 +18,12 @@ namespace TestDomain
 
 		public Address Address { get; set; }
 
-		public Student(Guid studentId, string firstName, string lastName, Address address)
+		public static Student Create(Guid studentId, string firstName, string lastName, Address address)
+		{
+			return new Student(studentId, firstName, lastName, address);
+		}
+
+		internal Student(Guid studentId, string firstName, string lastName, Address address)
 		{
 			StudentId = studentId;
 			FirstName = firstName;

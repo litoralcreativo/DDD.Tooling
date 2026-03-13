@@ -13,7 +13,12 @@ using Microsoft.CodeAnalysis.Formatting;
 namespace DDD.Analyzers.CodeFixes
 {
 	/// <summary>
-	/// Code Fix para agregar un Factory Method estático Create y hacer privado el constructor público
+	/// Code Fix para implementar correctamente el patrón Factory Method en Entities:
+	/// constructor privado + método estático público que devuelva la instancia.
+	/// Cubre tres escenarios:
+	/// 1. Constructor público sin factory method → hace privado el constructor y agrega Create estático
+	/// 2. Constructor privado sin factory method estático → agrega Create estático
+	/// 3. Método Create existente pero no estático → le agrega el modificador static
 	/// </summary>
 	[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(EntityFactoryMethodCodeFixProvider)), Shared]
 	public class EntityFactoryMethodCodeFixProvider : CodeFixProvider
@@ -35,48 +40,100 @@ namespace DDD.Analyzers.CodeFixes
 				.OfType<ClassDeclarationSyntax>()
 				.First();
 
-			context.RegisterCodeFix(
-				CodeAction.Create(
-					title: "Agregar Factory Method 'Create' y hacer el constructor privado",
-					createChangedDocument: c => AddFactoryMethodAsync(context.Document, classDeclaration, c),
-					equivalenceKey: nameof(EntityFactoryMethodCodeFixProvider)),
-				diagnostic);
+			var semanticModel = await context.Document.GetSemanticModelAsync(context.CancellationToken).ConfigureAwait(false);
+			var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration, context.CancellationToken);
+			if (classSymbol == null)
+				return;
+
+			// Detectar si hay un método de instancia (no estático) que devuelva la clase
+			var nonStaticFactoryMethod = classDeclaration.Members
+				.OfType<MethodDeclarationSyntax>()
+				.FirstOrDefault(m =>
+					!m.Modifiers.Any(SyntaxKind.StaticKeyword) &&
+					m.Modifiers.Any(SyntaxKind.PublicKeyword) &&
+					m.ReturnType.ToString() == classDeclaration.Identifier.Text);
+
+			if (nonStaticFactoryMethod != null)
+			{
+				// Caso 3: existe un método Create no estático → agregar static
+				context.RegisterCodeFix(
+					CodeAction.Create(
+						title: $"Hacer estático el método '{nonStaticFactoryMethod.Identifier.Text}'",
+						createChangedDocument: c => MakeFactoryMethodStaticAsync(context.Document, classDeclaration, nonStaticFactoryMethod, c),
+						equivalenceKey: nameof(EntityFactoryMethodCodeFixProvider) + "_MakeStatic"),
+					diagnostic);
+			}
+
+			var publicConstructor = classDeclaration.Members
+				.OfType<ConstructorDeclarationSyntax>()
+				.FirstOrDefault(c => c.Modifiers.Any(SyntaxKind.PublicKeyword));
+
+			var anyConstructor = classDeclaration.Members
+				.OfType<ConstructorDeclarationSyntax>()
+				.FirstOrDefault();
+
+			// Caso 1 y 2: agregar factory method Create + hacer privado el constructor si es público
+			var constructorForFactory = publicConstructor ?? anyConstructor;
+			if (constructorForFactory != null)
+			{
+				var title = publicConstructor != null
+					? "Agregar Factory Method 'Create' estático y hacer el constructor privado"
+					: "Agregar Factory Method 'Create' estático";
+
+				context.RegisterCodeFix(
+					CodeAction.Create(
+						title: title,
+						createChangedDocument: c => AddFactoryMethodAsync(context.Document, classDeclaration, constructorForFactory, publicConstructor != null, c),
+						equivalenceKey: nameof(EntityFactoryMethodCodeFixProvider) + "_AddFactory"),
+					diagnostic);
+			}
+		}
+
+		private async Task<Document> MakeFactoryMethodStaticAsync(
+			Document document,
+			ClassDeclarationSyntax classDeclaration,
+			MethodDeclarationSyntax method,
+			CancellationToken cancellationToken)
+		{
+			var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+
+			// Agregar modificador static después de public
+			var staticToken = SyntaxFactory.Token(SyntaxKind.StaticKeyword)
+				.WithTrailingTrivia(SyntaxFactory.Space);
+
+			var newModifiers = method.Modifiers.Add(staticToken);
+			var newMethod = method.WithModifiers(newModifiers)
+				.WithAdditionalAnnotations(Formatter.Annotation);
+
+			var newRoot = root.ReplaceNode(method, newMethod);
+			return document.WithSyntaxRoot(newRoot);
 		}
 
 		private async Task<Document> AddFactoryMethodAsync(
 			Document document,
 			ClassDeclarationSyntax classDeclaration,
+			ConstructorDeclarationSyntax targetConstructor,
+			bool makeConstructorPrivate,
 			CancellationToken cancellationToken)
 		{
 			var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
-			var semanticModel = await document.GetSemanticModelAsync(cancellationToken).ConfigureAwait(false);
 
-			var classSymbol = semanticModel.GetDeclaredSymbol(classDeclaration, cancellationToken);
-			if (classSymbol == null)
-				return document;
+			// Generar el Factory Method Create con los parámetros del constructor
+			var factoryMethod = GenerateFactoryMethod(classDeclaration.Identifier.Text, targetConstructor);
 
-			// Obtener el primer constructor público no implícito
-			var publicConstructor = classDeclaration.Members
-				.OfType<ConstructorDeclarationSyntax>()
-				.FirstOrDefault(c => c.Modifiers.Any(SyntaxKind.PublicKeyword));
+			// Encontrar el índice del constructor ANTES de cualquier reemplazo
+			var constructorIndex = classDeclaration.Members.IndexOf(targetConstructor);
 
-			if (publicConstructor == null)
-				return document;
+			var newMembers = classDeclaration.Members;
 
-			// Paso 1: hacer privado el constructor público
-			var privateConstructor = MakeConstructorPrivate(publicConstructor);
+			if (makeConstructorPrivate)
+			{
+				// Reemplazar el constructor público por uno privado
+				var privateConstructor = MakeConstructorPrivate(targetConstructor);
+				newMembers = newMembers.Replace(targetConstructor, privateConstructor);
+			}
 
-			// Paso 2: generar el Factory Method Create con los mismos parámetros
-			var factoryMethod = GenerateFactoryMethod(classDeclaration.Identifier.Text, publicConstructor);
-
-			// Encontrar el índice del constructor público original ANTES de reemplazarlo
-			var constructorIndex = classDeclaration.Members.IndexOf(publicConstructor);
-
-			// Reemplazar el constructor público por el privado
-			var newMembers = classDeclaration.Members
-				.Replace(publicConstructor, privateConstructor);
-
-			// Insertar el factory method justo antes del constructor (índice original)
+			// Insertar el factory method justo antes del constructor
 			newMembers = newMembers.Insert(constructorIndex, factoryMethod);
 
 			var newClassDeclaration = classDeclaration

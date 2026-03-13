@@ -41,22 +41,21 @@ namespace DDD.Analyzers
 			if (!hasEntityAttribute && !hasAggregateRootAttribute)
 				return;
 
-			// Verificar si tiene constructor público (no generado por compilador)
-			var hasPublicConstructor = classSymbol.Constructors
-				.Any(c => c.DeclaredAccessibility == Accessibility.Public && !c.IsImplicitlyDeclared);
-
-			if (!hasPublicConstructor)
-				return; // Ya tiene constructor privado/protected, ¡perfecto!
-
-			// Verificar si ya tiene algún Factory Method estático público que devuelva la instancia
-			var hasFactoryMethod = classSymbol.GetMembers()
+			// Verificar si tiene algún Factory Method estático público que devuelva la instancia
+			var hasStaticFactoryMethod = classSymbol.GetMembers()
 				.OfType<IMethodSymbol>()
 				.Any(m => m.IsStatic &&
 						 m.DeclaredAccessibility == Accessibility.Public &&
 						 SymbolEqualityComparer.Default.Equals(m.ReturnType, classSymbol));
 
-			if (hasFactoryMethod)
-				return; // Ya tiene Factory Method, ¡excelente!
+			// Verificar si tiene constructor público (no generado por compilador)
+			var hasPublicConstructor = classSymbol.Constructors
+				.Any(c => c.DeclaredAccessibility == Accessibility.Public && !c.IsImplicitlyDeclared);
+
+			// El patrón correcto es: factory method estático + sin constructor público.
+			// Se reporta si no tiene factory method estático, O si aún tiene constructor público.
+			if (hasStaticFactoryMethod && !hasPublicConstructor)
+				return; // ¡Patrón correcto!
 
 			// Sugerir el uso de Factory Method
 			var diagnostic = Diagnostic.Create(

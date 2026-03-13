@@ -8,10 +8,13 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace DDD.Analyzers
 {
 	/// <summary>
-	/// Analizador que valida que una clase no pueda ser Entity y ValueObject simultáneamente
+	/// Analizador que valida el uso correcto de los atributos DDD:
+	/// DDD003: [EntityId] solo puede aplicarse a propiedades
+	/// DDD005: una clase no puede ser [Entity] y [ValueObject] simultáneamente
+	/// DDD006: una clase no puede ser [AggregateRoot] y [ValueObject] simultáneamente
 	/// </summary>
 	[DiagnosticAnalyzer(LanguageNames.CSharp)]
-	public class DddAttributeConflictsAnalyzer : DiagnosticAnalyzer
+	public class DddAttributeUsageAnalyzer : DiagnosticAnalyzer
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(

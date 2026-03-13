@@ -129,7 +129,7 @@ namespace DDD.Analyzers
 		public static readonly DiagnosticDescriptor CrossContextInternalUsage = new DiagnosticDescriptor(
 			id: "DDD012",
 			title: "Uso interno de tipo de otro Bounded Context",
-			messageFormat: "El campo privado '{0}' en '{1}' (BC: '{2}') usa el tipo '{3}' (BC: '{4}'). Considera reemplazarlo por el Id del tipo para reducir el acoplamiento entre BCs.",
+			messageFormat: "El miembro '{0}' en '{1}' (BC: '{2}') usa el tipo '{3}' (BC: '{4}'). Considera reemplazarlo por el Id del tipo para reducir el acoplamiento entre BCs.",
 			category: Category,
 			defaultSeverity: DiagnosticSeverity.Warning,
 			isEnabledByDefault: true,

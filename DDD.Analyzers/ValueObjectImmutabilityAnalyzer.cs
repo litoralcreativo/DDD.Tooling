@@ -8,13 +8,16 @@ using Microsoft.CodeAnalysis.Diagnostics;
 namespace DDD.Analyzers
 {
 	/// <summary>
-	/// Analizador que valida que los ValueObjects sean inmutables (no tengan setters públicos)
+	/// Analizador que valida que los ValueObjects sean inmutables y sobrescriban Equals/GetHashCode
 	/// </summary>
 	[DiagnosticAnalyzer(LanguageNames.CSharp)]
 	public class ValueObjectImmutabilityAnalyzer : DiagnosticAnalyzer
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-			ImmutableArray.Create(DiagnosticDescriptors.ValueObjectShouldBeImmutable);
+			ImmutableArray.Create(
+				DiagnosticDescriptors.ValueObjectShouldBeImmutable,
+				DiagnosticDescriptors.ValueObjectMustOverrideEquals,
+				DiagnosticDescriptors.ValueObjectMustOverrideGetHashCode);
 
 		public override void Initialize(AnalysisContext context)
 		{
@@ -40,7 +43,7 @@ namespace DDD.Analyzers
 			if (!hasValueObjectAttribute)
 				return;
 
-			// Verificar propiedades con setters públicos
+			// 1. Verificar propiedades con setters públicos (inmutabilidad)
 			var propertiesWithPublicSetters = classSymbol.GetMembers()
 				.OfType<IPropertySymbol>()
 				.Where(prop => prop.SetMethod != null &&
@@ -59,6 +62,38 @@ namespace DDD.Analyzers
 
 					context.ReportDiagnostic(diagnostic);
 				}
+			}
+
+			// 2. Verificar que sobrescriba Equals(object)
+			var overridesEquals = classSymbol.GetMembers("Equals")
+				.OfType<IMethodSymbol>()
+				.Any(m => m.IsOverride &&
+						 m.Parameters.Length == 1 &&
+						 m.Parameters[0].Type.SpecialType == SpecialType.System_Object);
+
+			if (!overridesEquals)
+			{
+				var diagnostic = Diagnostic.Create(
+					DiagnosticDescriptors.ValueObjectMustOverrideEquals,
+					classDeclaration.Identifier.GetLocation(),
+					classSymbol.Name);
+
+				context.ReportDiagnostic(diagnostic);
+			}
+
+			// 3. Verificar que sobrescriba GetHashCode()
+			var overridesGetHashCode = classSymbol.GetMembers("GetHashCode")
+				.OfType<IMethodSymbol>()
+				.Any(m => m.IsOverride && m.Parameters.Length == 0);
+
+			if (!overridesGetHashCode)
+			{
+				var diagnostic = Diagnostic.Create(
+					DiagnosticDescriptors.ValueObjectMustOverrideGetHashCode,
+					classDeclaration.Identifier.GetLocation(),
+					classSymbol.Name);
+
+				context.ReportDiagnostic(diagnostic);
 			}
 		}
 	}

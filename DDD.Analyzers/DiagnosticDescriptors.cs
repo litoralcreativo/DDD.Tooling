@@ -62,5 +62,23 @@ namespace DDD.Analyzers
 			defaultSeverity: DiagnosticSeverity.Error,
 			isEnabledByDefault: true,
 			description: "Una clase no puede ser AggregateRoot y ValueObject al mismo tiempo.");
+
+		public static readonly DiagnosticDescriptor ValueObjectMustOverrideEquals = new DiagnosticDescriptor(
+			id: "DDD007",
+			title: "ValueObject debe sobrescribir Equals",
+			messageFormat: "La clase '{0}' está decorada con [ValueObject] pero no sobrescribe el método Equals(object). Los ValueObjects deben compararse por valor.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Warning,
+			isEnabledByDefault: true,
+			description: "Los Value Objects deben sobrescribir Equals para implementar igualdad por valor.");
+
+		public static readonly DiagnosticDescriptor ValueObjectMustOverrideGetHashCode = new DiagnosticDescriptor(
+			id: "DDD008",
+			title: "ValueObject debe sobrescribir GetHashCode",
+			messageFormat: "La clase '{0}' está decorada con [ValueObject] pero no sobrescribe el método GetHashCode(). Los ValueObjects deben implementar GetHashCode consistente con Equals.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Warning,
+			isEnabledByDefault: true,
+			description: "Los Value Objects deben sobrescribir GetHashCode para mantener consistencia con Equals.");
 	}
 }

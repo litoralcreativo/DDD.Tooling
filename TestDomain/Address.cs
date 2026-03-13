@@ -25,14 +25,10 @@ namespace TestDomain
 		{
 			if (obj is Address other)
 			{
-				return Street == other.Street &&
-					   City == other.City &&
-					   PostalCode == other.PostalCode &&
-					   Country == other.Country;
+				return Street == other.Street && City == other.City && PostalCode == other.PostalCode && Country == other.Country;
 			}
 			return false;
 		}
-
 		public override int GetHashCode()
 		{
 			unchecked

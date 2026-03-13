@@ -6,6 +6,15 @@ Herramientas de análisis estático para validar reglas de Domain-Driven Design 
 
 Proporcionar validación en tiempo de compilación de las reglas y patrones de DDD, ayudando a los desarrolladores a crear modelos de dominio consistentes y correctos.
 
+## ✨ Características
+
+- ✅ **6 Analizadores** para validar reglas DDD (DDD001-DDD008)
+- ✅ **Quick Fixes (Code Fixes)** para corregir automáticamente warnings
+- ✅ **Manejo inteligente de tipos** (detecta automáticamente structs, nullables, referencias)
+- ✅ **Validación en tiempo real** en el IDE
+- ✅ **Errores y Warnings claros** con mensajes descriptivos
+- ✅ **Fácil integración** vía NuGet (próximamente)
+
 ## 📦 Estructura del Proyecto
 
 ```
@@ -208,15 +217,25 @@ El proyecto `TestDomain` contiene ejemplos de uso correcto e incorrecto:
 - ✅ `Student.cs` - AggregateRoot correcto
 - ✅ `Address.cs` - ValueObject inmutable correcto
 - ⚠️ `InvalidValueObject.cs` - ValueObject con setter público (genera warning)
-- 📚 `ErrorExamples.cs` - Ejemplos comentados de errores
+
+## 📚 Documentación Adicional
+
+- 📖 [QUICKSTART.md](QUICKSTART.md) - Guía rápida de inicio
+- 🔧 [QUICKFIX_GUIDE.md](QUICKFIX_GUIDE.md) - Cómo usar los Quick Fixes
+- 🔍 [TYPE_HANDLING.md](TYPE_HANDLING.md) - Manejo inteligente de tipos en Code Fixes
+- 🗺️ [ROADMAP.md](ROADMAP.md) - Roadmap del proyecto
+- � [SUMMARY.md](SUMMARY.md) - Resumen de analizadores
+- 🎬 [DEMO.md](DEMO.md) - Demo completo
+- 🔄 [ANALYZER_RELOAD.md](ANALYZER_RELOAD.md) - Cómo recargar analizadores
+- �📚 `ErrorExamples.cs` - Ejemplos comentados de errores
 
 ## 🎯 Próximas Reglas a Implementar
 
 - [ ] DDD003 - EntityId solo en propiedades (no en campos)
-- [ ] DDD007 - Entities deben tener constructor privado/protected
-- [ ] DDD008 - ValueObjects deben implementar Equals/GetHashCode
 - [ ] DDD009 - AggregateRoot no debe exponer colecciones mutables
 - [ ] DDD010 - Domain Events solo en AggregateRoot
+- [ ] Code Fix para DDD001/002 - Agregar propiedad EntityId automáticamente
+- [ ] Code Fix para DDD004 - Convertir setters públicos a privados
 
 ## 📄 Licencia
 

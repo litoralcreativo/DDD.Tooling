@@ -23,5 +23,5 @@ namespace TestDomain
 			LastName = lastName;
 			EnrollmentDate = DateTime.UtcNow;
 		}
-	}
+	};
 }

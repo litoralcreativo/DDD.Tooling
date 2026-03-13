@@ -1,11 +1,9 @@
 using DDD.Abstractions;
 using System;
+using TestDomain.SharedKernel;
 
-namespace TestDomain
+namespace TestDomain.StudentManagment
 {
-	/// <summary>
-	/// Ejemplo de un AggregateRoot correcto
-	/// </summary>
 	[AggregateRoot]
 	public class Student
 	{

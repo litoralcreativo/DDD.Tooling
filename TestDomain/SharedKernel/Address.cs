@@ -1,10 +1,7 @@
 using DDD.Abstractions;
 
-namespace TestDomain
+namespace TestDomain.SharedKernel
 {
-	/// <summary>
-	/// Ejemplo de un ValueObject correcto (inmutable)
-	/// </summary>
 	[ValueObject]
 	public class Address
 	{

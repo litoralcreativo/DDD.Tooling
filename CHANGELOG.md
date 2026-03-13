@@ -7,6 +7,35 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [1.1.0] - 2026-03-13
+
+### ✨ Agregado
+
+#### Analizadores
+
+- **DDD009** - Entity/AggregateRoot debería usar Factory Method (Info)
+  - Detecta constructor público sin factory method estático
+  - Detecta factory method de instancia (no estático) que devuelve la clase
+  - El patrón correcto requiere: factory method estático público + constructor privado/internal
+  - Constructor `internal` + factory method estático = patrón válido (uso en mismo assembly)
+
+#### Code Fixes
+
+- **DDD009** - `EntityFactoryMethodCodeFixProvider` con 3 escenarios:
+  - **Escenario 1**: Constructor público sin factory method → hace privado el constructor + agrega `Create` estático
+  - **Escenario 2**: Constructor privado/internal sin factory method estático → agrega `Create` estático
+  - **Escenario 3**: Método `Create` existente no estático → agrega modificador `static`
+
+#### Ejemplos
+
+- `TestDomain/Examples/FactoryMethodExamples.cs` - Ejemplos de los distintos casos de DDD009
+
+### 🔧 Cambiado
+
+- Lógica del analizador DDD009: el patrón correcto ahora requiere **ambas** condiciones: factory method estático **Y** constructor no público (no solo una de las dos)
+
+---
+
 ## [1.0.0] - 2026-03-12
 
 ### ✨ Agregado
@@ -96,35 +125,18 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased] - Próximas versiones
 
-### 🎯 Planeado para v1.1.0
+### 🎯 Planeado para v1.2.0
 
 #### Analizadores
 
-- **DDD003** - EntityId solo en propiedades, no en campos
-- **DDD009** - AggregateRoot no debe exponer colecciones mutables
-- **DDD010** - Domain Events solo en AggregateRoots
+- **DDD010** - AggregateRoot no debe exponer colecciones mutables (`List<T>` → `IReadOnlyCollection<T>`)
+- **DDD011** - Domain Events solo en AggregateRoots
+- **DDD012** - Repository pattern validation
 
 #### Code Fixes
 
 - **DDD004** - Convertir setter público a privado/init
 - **DDD005/006** - Remover atributos conflictivos
-- Opción para elegir tipo de ID (Guid, int, string, long)
-- Agregar constructor con inicialización de ID
-
-#### Mejoras
-
-- Soporte para `IEquatable<T>` en ValueObjects
-- Detección de colecciones inmutables (ImmutableList, ReadOnlyCollection)
-- Sugerencias para operadores `==` y `!=` en ValueObjects
-- Análisis de constructores en Entities
-
-### 🎯 Planeado para v1.2.0
-
-#### Analizadores
-
-- **DDD011** - Validation rules (Domain invariants)
-- **DDD012** - Repository pattern validation
-- **DDD013** - Factory pattern validation
 
 #### Infraestructura
 
@@ -137,21 +149,17 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## 📊 Estadísticas de la Versión Actual
 
-### v1.0.0
+### v1.1.0
 
-- **Analizadores**: 6 reglas (DDD001-DDD008, excluye DDD003 sin implementar)
-- **Code Fixes**: 2 providers
-    - EntityIdCodeFixProvider (DDD001/002)
-    - ValueObjectEqualsCodeFixProvider (DDD007/008)
+- **Analizadores**: 9 reglas (DDD001-DDD009)
+- **Code Fixes**: 3 providers
+    - `EntityIdCodeFixProvider` (DDD001/002)
+    - `ValueObjectEqualsCodeFixProvider` (DDD007/008)
+    - `EntityFactoryMethodCodeFixProvider` (DDD009)
 - **Atributos**: 4 (Entity, EntityId, AggregateRoot, ValueObject)
-- **Ejemplos**: 8 archivos de ejemplo
-- **Documentación**: 12 archivos markdown
-- **Líneas de código**: ~2,000 líneas
-- **Cobertura**: Reglas básicas de DDD + Code Fixes automáticos
-- **Ejemplos**: 7 archivos de ejemplo
-- **Documentación**: 11 archivos markdown
-- **Líneas de código**: ~1,500 líneas
-- **Cobertura**: Reglas básicas de DDD
+- **Ejemplos**: 5 archivos de ejemplo en TestDomain
+- **Documentación**: 12+ archivos markdown
+- **Líneas de código**: ~2,500 líneas
 
 ---
 
@@ -195,4 +203,4 @@ Usamos [Conventional Commits](https://www.conventionalcommits.org/):
 
 ---
 
-**Última actualización**: 12 de Marzo 2026
+**Última actualización**: 13 de Marzo 2026

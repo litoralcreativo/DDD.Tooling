@@ -8,8 +8,8 @@ Proporcionar validación en tiempo de compilación de las reglas y patrones de D
 
 ## ✨ Características
 
-- ✅ **7 Analizadores** para validar reglas DDD (DDD001-DDD009)
-- ✅ **Quick Fixes (Code Fixes)** para corregir automáticamente errores/warnings
+- ✅ **9 Analizadores** para validar reglas DDD (DDD001-DDD009)
+- ✅ **3 Code Fix Providers** para corregir automáticamente errores/warnings
 - ✅ **Sugerencias educativas (Info)** para mejorar el diseño
 - ✅ **Manejo inteligente de tipos** (detecta automáticamente structs, nullables, referencias)
 - ✅ **Validación en tiempo real** en el IDE
@@ -28,15 +28,21 @@ DDD.Tooling/
 │       └── ValueObjectAttribute.cs
 ├── DDD.Analyzers/              # Analizadores Roslyn
 │   ├── DiagnosticDescriptors.cs
-│   ├── EntityMustHaveEntityIdAnalyzer.cs
-│   ├── AggregateRootMustHaveEntityIdAnalyzer.cs
-│   ├── ValueObjectImmutabilityAnalyzer.cs
-│   └── DddAttributeConflictsAnalyzer.cs
+│   ├── EntityMustHaveEntityIdAnalyzer.cs       # DDD001
+│   ├── AggregateRootMustHaveEntityIdAnalyzer.cs # DDD002
+│   ├── ValueObjectImmutabilityAnalyzer.cs      # DDD004
+│   ├── DddAttributeConflictsAnalyzer.cs        # DDD005/006/007/008
+│   ├── EntityFactoryMethodAnalyzer.cs          # DDD009
+│   └── CodeFixes/
+│       ├── EntityIdCodeFixProvider.cs          # Fix para DDD001/002
+│       ├── ValueObjectEqualsCodeFixProvider.cs # Fix para DDD007/008
+│       └── EntityFactoryMethodCodeFixProvider.cs # Fix para DDD009
 └── TestDomain/                 # Proyecto de prueba
     ├── Course.cs
     ├── Student.cs
     ├── Address.cs
     └── Examples/
+        ├── FactoryMethodExamples.cs
         ├── InvalidValueObject.cs
         └── ErrorExamples.cs
 ```
@@ -46,6 +52,8 @@ DDD.Tooling/
 ### DDD001 - Entity debe tener EntityId ❌ Error
 
 **Descripción**: Todas las clases decoradas con `[Entity]` deben tener al menos una propiedad decorada con `[EntityId]`.
+
+**Quick Fix disponible**: Agrega `[EntityId] public Guid Id { get; private set; }` automáticamente.
 
 **Ejemplo incorrecto:**
 
@@ -76,18 +84,13 @@ public class Product
 
 **Descripción**: Todas las clases decoradas con `[AggregateRoot]` deben tener al menos una propiedad decorada con `[EntityId]`.
 
-**Ejemplo correcto:**
+**Quick Fix disponible**: Agrega `[EntityId] public Guid Id { get; private set; }` automáticamente.
 
-```csharp
-[AggregateRoot]
-public class Order
-{
-    [EntityId]
-    public Guid OrderId { get; private set; }  // ✅ Correcto
+---
 
-    public DateTime CreatedAt { get; private set; }
-}
-```
+### DDD003 - EntityId solo en propiedades ❌ Error
+
+**Descripción**: El atributo `[EntityId]` solo puede aplicarse a propiedades, no a campos u otros miembros.
 
 ---
 
@@ -137,17 +140,36 @@ public class Money
 
 ---
 
+### DDD007 - ValueObject debe sobrescribir Equals ⚠️ Warning
+
+**Descripción**: Los ValueObjects deben compararse por valor, por lo que deben sobrescribir `Equals(object)`.
+
+**Quick Fix disponible**: Genera `Equals` con comparación de todas las propiedades públicas.
+
+---
+
+### DDD008 - ValueObject debe sobrescribir GetHashCode ⚠️ Warning
+
+**Descripción**: Los ValueObjects deben sobrescribir `GetHashCode` de forma consistente con `Equals`.
+
+**Quick Fix disponible**: Genera `GetHashCode` con manejo inteligente de tipos (value types, nullables, referencias).
+
+---
+
 ### DDD009 - Entity debería usar Factory Method ℹ️ Info
 
-**Descripción**: Sugerencia educativa para usar Factory Methods en Entities/AggregateRoots con constructores públicos.
+**Descripción**: Las Entities y AggregateRoots deben usar el patrón Factory Method: constructor privado/internal + método estático público que devuelva la instancia. Se reporta cuando el constructor es público o cuando no existe un factory method estático.
 
-**Este es un mensaje informativo**, no bloquea la compilación. Es una recomendación de buena práctica DDD.
+**Quick Fix disponible** (3 escenarios):
+- Constructor público sin factory method → hace privado el constructor + agrega `Create` estático
+- Constructor privado sin factory method estático → agrega `Create` estático
+- Método `Create` existente pero no estático → agrega el modificador `static`
 
 **Ejemplo que genera info:**
 
 ```csharp
 [Entity]
-public class Product  // ℹ️ Sugerencia
+public class Product  // ℹ️ DDD009
 {
     [EntityId]
     public Guid Id { get; private set; }
@@ -169,15 +191,15 @@ public class Product
     [EntityId]
     public Guid Id { get; private set; }
 
-    private Product() { }  // ✅ Constructor privado
-
-    public static Product Create(string name)  // ✅ Factory Method
+    public static Product Create(string name)  // ✅ Factory Method estático
     {
-        return new Product
-        {
-            Id = Guid.NewGuid(),
-            Name = name
-        };
+        return new Product(name);
+    }
+
+    private Product(string name)  // ✅ Constructor privado
+    {
+        Id = Guid.NewGuid();
+        Name = name;
     }
 }
 ```
@@ -281,11 +303,10 @@ El proyecto `TestDomain` contiene ejemplos de uso correcto e incorrecto:
 
 ## 🎯 Próximas Reglas a Implementar
 
-- [ ] DDD003 - EntityId solo en propiedades (no en campos)
-- [ ] DDD009 - AggregateRoot no debe exponer colecciones mutables
-- [ ] DDD010 - Domain Events solo en AggregateRoot
-- [ ] Code Fix para DDD001/002 - Agregar propiedad EntityId automáticamente
-- [ ] Code Fix para DDD004 - Convertir setters públicos a privados
+- [ ] DDD010 - AggregateRoot no debe exponer colecciones mutables (`List<T>` → `IReadOnlyCollection<T>`)
+- [ ] DDD011 - Domain Events solo en AggregateRoot
+- [ ] Code Fix para DDD004 - Convertir setters públicos a privados/init
+- [ ] Tests unitarios para todos los analizadores
 
 ## 📄 Licencia
 

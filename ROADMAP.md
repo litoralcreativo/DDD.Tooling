@@ -2,60 +2,31 @@
 
 ## ✅ Implementado (v1.0)
 
-- [x] **DDD001** - Validar que Entity tenga EntityId
-- [x] **DDD002** - Validar que AggregateRoot tenga EntityId
-- [x] **DDD004** - Validar inmutabilidad de ValueObjects
-- [x] **DDD005** - Prevenir Entity + ValueObject
-- [x] **DDD006** - Prevenir AggregateRoot + ValueObject
+- [x] **DDD001** - Validar que Entity tenga EntityId ❌ Error
+  - [x] Code Fix: agrega `[EntityId] public Guid Id { get; private set; }` automáticamente
+- [x] **DDD002** - Validar que AggregateRoot tenga EntityId ❌ Error
+  - [x] Code Fix: agrega `[EntityId] public Guid Id { get; private set; }` automáticamente
+- [x] **DDD003** - EntityId solo en propiedades, no en campos ❌ Error
+- [x] **DDD004** - Validar inmutabilidad de ValueObjects ⚠️ Warning
+- [x] **DDD005** - Prevenir Entity + ValueObject simultáneamente ❌ Error
+- [x] **DDD006** - Prevenir AggregateRoot + ValueObject simultáneamente ❌ Error
+- [x] **DDD007** - ValueObject debe sobrescribir Equals ⚠️ Warning
+  - [x] Code Fix: genera `Equals` con comparación de todas las propiedades
+- [x] **DDD008** - ValueObject debe sobrescribir GetHashCode ⚠️ Warning
+  - [x] Code Fix: genera `GetHashCode` con manejo inteligente de tipos
+- [x] **DDD009** - Entity/AggregateRoot debería usar Factory Method ℹ️ Info
+  - [x] Code Fix (3 escenarios): hacer constructor privado + agregar `Create` estático / agregar `static` a método existente
 
 ## 🚧 Próximas Implementaciones
 
-### Fase 2 - Code Fixes (Auto-correcciones)
+### Fase 2 - Code Fixes Pendientes
 
-- [ ] **Code Fix para DDD001/DDD002**: Agregar automáticamente propiedad `[EntityId] public Guid Id { get; private set; }`
 - [ ] **Code Fix para DDD004**: Convertir setters públicos a `{ get; }` o `{ get; private set; }`
 - [ ] **Code Fix para DDD005/DDD006**: Ofrecer remover uno de los atributos conflictivos
 
 ### Fase 3 - Analizadores Adicionales
 
-#### DDD003 - EntityId solo en propiedades
-
-```csharp
-[Entity]
-public class Product
-{
-    [EntityId]
-    private Guid _id;  // ❌ Error: EntityId debe estar en propiedad, no campo
-}
-```
-
-#### DDD007 - Constructor validations
-
-```csharp
-[Entity]
-public class Order
-{
-    [EntityId]
-    public Guid Id { get; private set; }
-
-    public Order() { }  // ❌ Warning: Entity debería tener constructor privado/protected
-}
-```
-
-#### DDD008 - ValueObject debe implementar Equals/GetHashCode
-
-```csharp
-[ValueObject]
-public class Money
-{
-    public decimal Amount { get; }
-    public string Currency { get; }
-
-    // ❌ Warning: Falta override de Equals y GetHashCode
-}
-```
-
-#### DDD009 - AggregateRoot no debe exponer colecciones mutables
+#### DDD010 - AggregateRoot no debe exponer colecciones mutables
 
 ```csharp
 [AggregateRoot]
@@ -70,7 +41,7 @@ public class Order
 }
 ```
 
-#### DDD010 - Domain Events solo en AggregateRoot
+#### DDD011 - Domain Events solo en AggregateRoot
 
 ```csharp
 [Entity]
@@ -80,7 +51,7 @@ public class OrderItem
 }
 ```
 
-#### DDD011 - Validar nombres de EntityId
+#### DDD012 - Validar nombres de EntityId
 
 ```csharp
 [Entity]
@@ -91,7 +62,7 @@ public class Product
 }
 ```
 
-#### DDD012 - Repository pattern
+#### DDD013 - Repository pattern
 
 ```csharp
 // Validar que los repositorios solo trabajen con AggregateRoots

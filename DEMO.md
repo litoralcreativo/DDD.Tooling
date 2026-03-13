@@ -145,7 +145,12 @@ public class ShoppingCart
     private readonly List<CartItem> _items = new List<CartItem>();
     public IReadOnlyCollection<CartItem> Items => _items.AsReadOnly();
 
-    public ShoppingCart(Guid cartId)
+    public static ShoppingCart Create(Guid cartId)  // ✅ Factory Method estático
+    {
+        return new ShoppingCart(cartId);
+    }
+
+    private ShoppingCart(Guid cartId)  // ✅ Constructor privado
     {
         CartId = cartId;
         CreatedAt = DateTime.UtcNow;
@@ -156,28 +161,48 @@ public class ShoppingCart
         _items.Add(item);
     }
 }
-
-[Entity]
-public class CartItem
-{
-    [EntityId]
-    public Guid ItemId { get; private set; }
-
-    public Guid ProductId { get; private set; }
-    public int Quantity { get; private set; }
-    public decimal UnitPrice { get; private set; }
-
-    public CartItem(Guid itemId, Guid productId, int quantity, decimal unitPrice)
-    {
-        ItemId = itemId;
-        ProductId = productId;
-        Quantity = quantity;
-        UnitPrice = unitPrice;
-    }
-}
 ```
 
 **Resultado:** ✅ Compila perfectamente - Modelo DDD válido!
+
+---
+
+### Escenario 7: Entity con Factory Method ℹ️ DDD009
+
+```csharp
+[Entity]
+public class Product  // ℹ️ DDD009 - Constructor público sin factory method estático
+{
+    [EntityId]
+    public Guid Id { get; private set; }
+
+    public Product(string name) { ... }  // ⬅️ Constructor público
+}
+```
+
+**Resultado:**
+
+```
+Info DDD009: La clase 'Product' tiene constructor público. Considera usar un Factory Method estático...
+```
+
+**Después del Quick Fix:**
+
+```csharp
+[Entity]
+public class Product  // ✅ Sin DDD009
+{
+    [EntityId]
+    public Guid Id { get; private set; }
+
+    public static Product Create(string name)  // ✅ Factory Method estático
+    {
+        return new Product(name);
+    }
+
+    private Product(string name) { ... }  // ✅ Constructor privado
+}
+```
 
 ---
 

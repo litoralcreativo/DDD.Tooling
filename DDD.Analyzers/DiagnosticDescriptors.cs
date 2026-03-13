@@ -39,7 +39,7 @@ namespace DDD.Analyzers
 		public static readonly DiagnosticDescriptor ValueObjectShouldBeImmutable = new DiagnosticDescriptor(
 			id: "DDD004",
 			title: "ValueObject debe ser inmutable",
-			messageFormat: "La propiedad '{0}' en el ValueObject '{1}' tiene un setter público. Los ValueObjects deben ser inmutables",
+			messageFormat: "La propiedad '{0}' en el ValueObject '{1}' tiene un setter público. Los ValueObjects deben ser inmutables.",
 			category: Category,
 			defaultSeverity: DiagnosticSeverity.Warning,
 			isEnabledByDefault: true,
@@ -48,7 +48,7 @@ namespace DDD.Analyzers
 		public static readonly DiagnosticDescriptor CannotBeEntityAndValueObject = new DiagnosticDescriptor(
 			id: "DDD005",
 			title: "Una clase no puede ser Entity y ValueObject simultáneamente",
-			messageFormat: "La clase '{0}' está decorada con [Entity] y [ValueObject]. Debe ser uno u otro, no ambos",
+			messageFormat: "La clase '{0}' está decorada con [Entity] y [ValueObject]. Debe ser uno u otro, no ambos.",
 			category: Category,
 			defaultSeverity: DiagnosticSeverity.Error,
 			isEnabledByDefault: true,
@@ -57,7 +57,7 @@ namespace DDD.Analyzers
 		public static readonly DiagnosticDescriptor CannotBeAggregateRootAndValueObject = new DiagnosticDescriptor(
 			id: "DDD006",
 			title: "Una clase no puede ser AggregateRoot y ValueObject simultáneamente",
-			messageFormat: "La clase '{0}' está decorada con [AggregateRoot] y [ValueObject]. Debe ser uno u otro, no ambos",
+			messageFormat: "La clase '{0}' está decorada con [AggregateRoot] y [ValueObject]. Debe ser uno u otro, no ambos.",
 			category: Category,
 			defaultSeverity: DiagnosticSeverity.Error,
 			isEnabledByDefault: true,

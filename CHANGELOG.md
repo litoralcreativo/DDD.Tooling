@@ -14,17 +14,17 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 #### Analizadores
 
 - **DDD009** - Entity/AggregateRoot debería usar Factory Method (Info)
-  - Detecta constructor público sin factory method estático
-  - Detecta factory method de instancia (no estático) que devuelve la clase
-  - El patrón correcto requiere: factory method estático público + constructor privado/internal
-  - Constructor `internal` + factory method estático = patrón válido (uso en mismo assembly)
+    - Detecta constructor público sin factory method estático
+    - Detecta factory method de instancia (no estático) que devuelve la clase
+    - El patrón correcto requiere: factory method estático público + constructor privado/internal
+    - Constructor `internal` + factory method estático = patrón válido (uso en mismo assembly)
 
 #### Code Fixes
 
 - **DDD009** - `EntityFactoryMethodCodeFixProvider` con 3 escenarios:
-  - **Escenario 1**: Constructor público sin factory method → hace privado el constructor + agrega `Create` estático
-  - **Escenario 2**: Constructor privado/internal sin factory method estático → agrega `Create` estático
-  - **Escenario 3**: Método `Create` existente no estático → agrega modificador `static`
+    - **Escenario 1**: Constructor público sin factory method → hace privado el constructor + agrega `Create` estático
+    - **Escenario 2**: Constructor privado/internal sin factory method estático → agrega `Create` estático
+    - **Escenario 3**: Método `Create` existente no estático → agrega modificador `static`
 
 #### Ejemplos
 

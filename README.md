@@ -161,6 +161,7 @@ public class Money
 **Descripción**: Las Entities y AggregateRoots deben usar el patrón Factory Method: constructor privado/internal + método estático público que devuelva la instancia. Se reporta cuando el constructor es público o cuando no existe un factory method estático.
 
 **Quick Fix disponible** (3 escenarios):
+
 - Constructor público sin factory method → hace privado el constructor + agrega `Create` estático
 - Constructor privado sin factory method estático → agrega `Create` estático
 - Método `Create` existente pero no estático → agrega el modificador `static`

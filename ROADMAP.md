@@ -3,19 +3,19 @@
 ## ✅ Implementado (v1.0)
 
 - [x] **DDD001** - Validar que Entity tenga EntityId ❌ Error
-  - [x] Code Fix: agrega `[EntityId] public Guid Id { get; private set; }` automáticamente
+    - [x] Code Fix: agrega `[EntityId] public Guid Id { get; private set; }` automáticamente
 - [x] **DDD002** - Validar que AggregateRoot tenga EntityId ❌ Error
-  - [x] Code Fix: agrega `[EntityId] public Guid Id { get; private set; }` automáticamente
+    - [x] Code Fix: agrega `[EntityId] public Guid Id { get; private set; }` automáticamente
 - [x] **DDD003** - EntityId solo en propiedades, no en campos ❌ Error
 - [x] **DDD004** - Validar inmutabilidad de ValueObjects ⚠️ Warning
 - [x] **DDD005** - Prevenir Entity + ValueObject simultáneamente ❌ Error
 - [x] **DDD006** - Prevenir AggregateRoot + ValueObject simultáneamente ❌ Error
 - [x] **DDD007** - ValueObject debe sobrescribir Equals ⚠️ Warning
-  - [x] Code Fix: genera `Equals` con comparación de todas las propiedades
+    - [x] Code Fix: genera `Equals` con comparación de todas las propiedades
 - [x] **DDD008** - ValueObject debe sobrescribir GetHashCode ⚠️ Warning
-  - [x] Code Fix: genera `GetHashCode` con manejo inteligente de tipos
+    - [x] Code Fix: genera `GetHashCode` con manejo inteligente de tipos
 - [x] **DDD009** - Entity/AggregateRoot debería usar Factory Method ℹ️ Info
-  - [x] Code Fix (3 escenarios): hacer constructor privado + agregar `Create` estático / agregar `static` a método existente
+    - [x] Code Fix (3 escenarios): hacer constructor privado + agregar `Create` estático / agregar `static` a método existente
 
 ## 🚧 Próximas Implementaciones
 

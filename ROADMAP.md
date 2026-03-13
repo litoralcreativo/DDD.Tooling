@@ -9,11 +9,12 @@
 - [x] **DDD003** - EntityId solo en propiedades, no en campos ❌ Error
     - [x] Code Fix: convierte el campo en propiedad automáticamente
 - [x] **DDD004** - Validar inmutabilidad de ValueObjects ⚠️ Warning
-    - [x] Code Fix: convierte setter público a `{ get; private set; }`
+    - [x] Code Fix: convierte setter público a `{ get; private set; }` o `{ get; init; }`
+    - [x] Los accessors `init` no disparan DDD004 (son válidos en ValueObjects)
 - [x] **DDD005** - Prevenir Entity + ValueObject simultáneamente ❌ Error
-    - [x] Code Fix: elimina el atributo `[ValueObject]` conflictivo
+    - [x] Code Fix: elimina el atributo conflictivo (preserva separadores correctamente)
 - [x] **DDD006** - Prevenir AggregateRoot + ValueObject simultáneamente ❌ Error
-    - [x] Code Fix: elimina el atributo `[ValueObject]` conflictivo
+    - [x] Code Fix: elimina el atributo conflictivo (preserva separadores correctamente)
 - [x] **DDD007** - ValueObject debe sobrescribir Equals ⚠️ Warning
     - [x] Code Fix: genera `Equals` con comparación de todas las propiedades
 - [x] **DDD008** - ValueObject debe sobrescribir GetHashCode ⚠️ Warning
@@ -41,20 +42,29 @@
     - [x] Detecta múltiples propiedades con `[EntityId]` en la misma entidad o agregado
     - [ ] Code Fix: sin fix por decisión de diseño (¿cuál ID es el correcto?)
 
+## ✅ Implementado (v1.3) — Testing
+
+- [x] **74 tests unitarios** cubriendo todos los analizadores y Code Fixes
+    - [x] Fase 3 — Tests para DDD001–DDD013 (55 tests, todos verdes)
+    - [x] Fase 4 — Tests de Code Fixes para DDD001–DDD011 (19 tests adicionales, todos verdes)
+    - [x] Stack: xUnit + `Microsoft.CodeAnalysis.CSharp.Analyzer.Testing` + `Microsoft.CodeAnalysis.CSharp.CodeFix.Testing`
+
 ## 🚧 Próximas Implementaciones
 
-### Fase 2 - Testing Framework
+### Packaging NuGet
 
-- [ ] Crear proyecto `DDD.Analyzers.Tests`
-- [ ] Tests unitarios para cada analizador
-- [ ] Tests de verificación de Code Fixes
-- [ ] Integración con GitHub Actions / Azure Pipelines
-
-### Fase 3 - Documentación y Packaging
-
-- [ ] Generar documentación completa con ejemplos
-- [ ] Crear package NuGet público
+- [ ] Configurar `DDD.Abstractions.csproj` para publicar `DDD.Tooling.Abstractions`
+- [ ] Configurar `DDD.Analyzers.csproj` para publicar `DDD.Tooling.Analyzers`
+- [ ] Publicar en NuGet.org
 - [ ] Logo y branding
+
+### CI/CD
+
+- [ ] GitHub Actions para build + test en cada PR
+- [ ] GitHub Actions para publicar NuGet en cada release
+
+### Documentación adicional
+
 - [ ] Wiki con patrones DDD comunes
 - [ ] Video tutoriales
 

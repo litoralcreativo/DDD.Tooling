@@ -48,6 +48,11 @@ DDD.Tooling/
 │       ├── EntityFactoryMethodCodeFixProvider.cs     # Fix para DDD009
 │       ├── BoundedContextDeclarationCodeFixProvider.cs # Fix para DDD010
 │       └── CrossBoundedContextReferenceCodeFixProvider.cs # Fix para DDD011
+├── DDD.Analyzers.Tests/        # Tests unitarios (74 tests)
+│   ├── Analyzers/              # Tests DDD001–DDD013
+│   ├── CodeFixes/              # Tests de Code Fixes
+│   └── Helpers/
+│       └── AnalyzerTestHelper.cs
 └── TestDomain/                 # Proyecto de prueba
     ├── Catalog/
     │   ├── Course.cs
@@ -420,10 +425,12 @@ El proyecto `TestDomain` contiene ejemplos de uso correcto e incorrecto, organiz
 - 🎬 [DEMO.md](DEMO.md) - Demo completo con ejemplos
 - 📋 [CHANGELOG.md](CHANGELOG.md) - Historial de cambios
 
-## 🎯 Próximas Reglas a Implementar
+## 🎯 Estado del Proyecto
 
-- [ ] Tests unitarios para todos los analizadores
-- [ ] Publicar NuGet package
+- ✅ **13 reglas** implementadas y testeadas (DDD001–DDD013)
+- ✅ **7 Code Fix Providers** implementados y testeados
+- ✅ **74 tests unitarios** — 100% verdes (55 analyzer + 19 codefix)
+- 🚧 **Publicación NuGet** — próximamente en NuGet.org
 
 ## 📄 Licencia
 

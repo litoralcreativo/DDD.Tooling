@@ -7,6 +7,30 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [1.3.0] - 2026-03-13
+
+### ✨ Agregado
+
+#### Tests unitarios (74 tests, 100% verdes)
+
+- **Fase 3** — Tests para todos los analizadores DDD001–DDD013 (55 tests)
+    - Stack: xUnit + `Microsoft.CodeAnalysis.CSharp.Analyzer.Testing v1.1.2`
+    - Cobertura completa de casos válidos e inválidos por regla
+    - Tests de diagnósticos DDD011 con `DiagnosticResult` explícito (múltiples descriptores comparten ID)
+
+- **Fase 4** — Tests de Code Fixes DDD001–DDD011 (19 tests)
+    - Stack: `Microsoft.CodeAnalysis.CSharp.CodeFix.Testing v1.1.2`
+    - Tests cubren: DDD001, DDD002, DDD003, DDD004 (×2), DDD005 (×2), DDD006 (×2), DDD007, DDD008, DDD009 (×2), DDD010 (×2), DDD011 (×2)
+
+### 🔧 Corregido
+
+- **`ValueObjectImmutabilityAnalyzer` (DDD004)**: los accessors `init` (`{ get; init; }`) ya **no** disparan DDD004 — son válidos en ValueObjects por ser inmutables tras la construcción
+- **`EntityIdCodeFixProvider` (DDD001/002)**: ahora agrega `using System;` automáticamente si `Guid` no está disponible en el archivo destino
+- **`EntityIdCodeFixProvider` (DDD001/002)**: corregido `InvalidOperationException` ("Sequence contains no matching element") al reemplazar clase cuando se agregan usings simultáneamente
+- **`ValueObjectMutabilityCodeFixProvider` (DDD005/006)**: al quitar un atributo de una lista compartida (e.g. `[Entity, ValueObject]`), ahora reconstruye la lista con `SyntaxFactory.SeparatedList` eliminando también el separador coma, evitando el artefacto `[Entity ]`
+
+---
+
 ## [1.1.0] - 2026-03-13
 
 ### ✨ Agregado
@@ -159,33 +183,34 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased] - Próximas versiones
 
-### 🎯 Planeado para v1.2.0
+### 🎯 Planeado para v2.0.0
 
-#### Code Fixes
+#### Packaging
 
-- **DDD004** - Convertir setter público a privado/init
-- **DDD005/006** - Remover atributos conflictivos
+- Publicar `DDD.Tooling.Abstractions` en NuGet.org
+- Publicar `DDD.Tooling.Analyzers` en NuGet.org
 
-#### Infraestructura
+#### CI/CD
 
-- Publicación en NuGet
-- Paquete analyzer como .nupkg
-- CI/CD con GitHub Actions
-- Unit tests para analizadores
+- GitHub Actions para build + test en cada PR
+- GitHub Actions para publicar NuGet en cada release
 
 ---
 
 ## 📊 Estadísticas de la Versión Actual
 
-### v1.1.0
+### v1.3.0
 
-- **Analizadores**: 7 clases, 12 reglas (DDD001-DDD012)
-- **Code Fixes**: 5 providers
+- **Analizadores**: 8 clases, 13 reglas (DDD001-DDD013)
+- **Code Fixes**: 7 providers
     - `EntityIdCodeFixProvider` (DDD001/002)
+    - `EntityIdOnPropertyCodeFixProvider` (DDD003)
+    - `ValueObjectMutabilityCodeFixProvider` (DDD004/005/006)
     - `ValueObjectEqualsCodeFixProvider` (DDD007/008)
     - `EntityFactoryMethodCodeFixProvider` (DDD009)
     - `BoundedContextDeclarationCodeFixProvider` (DDD010)
     - `CrossBoundedContextReferenceCodeFixProvider` (DDD011)
+- **Tests unitarios**: 74 (55 analyzer + 19 codefix), 100% verdes
 - **Atributos**: 6 (Entity, EntityId, AggregateRoot, ValueObject, BoundedContext, SharedKernel)
 - **Ejemplos**: 3 BCs en TestDomain (Catalog, StudentManagement, SharedKernel)
 - **Documentación**: 12+ archivos markdown

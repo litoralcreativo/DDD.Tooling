@@ -47,90 +47,73 @@ namespace DDD.Analyzers
 			if (ownerBoundedContext == null && !ownerIsSharedKernel)
 				return;
 
-			// Analizar solo propiedades no-privadas (campos privados son implementación interna)
-			foreach (var property in classDeclaration.Members.OfType<PropertyDeclarationSyntax>())
+			var ownerBcLabel = ownerIsSharedKernel ? "SharedKernel" : ownerBoundedContext;
+
+			// Recorremos todos los miembros: propiedades y campos
+			foreach (var member in classDeclaration.Members)
 			{
-				// Ignorar propiedades privadas
-				if (property.Modifiers.Any(m => m.IsKind(SyntaxKind.PrivateKeyword)))
-					continue;
+				ITypeSymbol memberType = null;
+				Location memberLocation = null;
+				bool isPrivateMember = false;
+				string memberName = null;
 
-				var propertySymbol = context.SemanticModel.GetDeclaredSymbol(property);
-				if (propertySymbol == null)
-					continue;
+				if (member is PropertyDeclarationSyntax property)
+				{
+					// Propiedad privada o protegida → DDD012 (Info)
+					// Propiedad pública o internal → DDD011 (Error)
+					isPrivateMember = property.Modifiers.Any(m =>
+						m.IsKind(SyntaxKind.PrivateKeyword) || m.IsKind(SyntaxKind.ProtectedKeyword));
 
-				// Extraer los tipos DDD a verificar (resuelve genéricos: List<T> → T)
-				var dddTypesToCheck = ExtractDddTypes(propertySymbol.Type);
+					var propSymbol = context.SemanticModel.GetDeclaredSymbol(property);
+					if (propSymbol == null) continue;
 
-				foreach (var (typeSymbol, isAggregateRoot, isEntity) in dddTypesToCheck)
+					memberType = propSymbol.Type;
+					memberLocation = property.GetLocation();
+					memberName = property.Identifier.Text;
+				}
+				else if (member is FieldDeclarationSyntax field)
+				{
+					// Todos los campos → DDD012 (Info), son detalles de implementación
+					isPrivateMember = true;
+					memberType = context.SemanticModel.GetTypeInfo(field.Declaration.Type).Type;
+					memberLocation = field.GetLocation();
+					memberName = field.Declaration.Variables.FirstOrDefault()?.Identifier.Text;
+				}
+
+				if (memberType == null) continue;
+
+				foreach (var (typeSymbol, isAggregateRoot, isEntity) in ExtractDddTypes(memberType))
 				{
 					var referencedBc = GetBoundedContextName(typeSymbol);
-					var referencedIsSharedKernel = typeSymbol.GetAttributes()
-						.Any(a => a.AttributeClass?.Name == "SharedKernelAttribute");
 
-					// Cualquier BC puede referenciar [SharedKernel] libremente
-					if (referencedIsSharedKernel)
+					// SharedKernel puede ser referenciado libremente
+					if (typeSymbol.GetAttributes().Any(a => a.AttributeClass?.Name == "SharedKernelAttribute"))
 						continue;
 
-					// Solo nos interesa si el tipo referenciado tiene BC declarado
+					// Solo tipos con BC declarado
 					if (referencedBc == null)
 						continue;
 
-					// Regla 1: [SharedKernel] no puede referenciar tipos de un BC específico
-					if (ownerIsSharedKernel)
-					{
-						context.ReportDiagnostic(Diagnostic.Create(
-							GetDescriptor(isAggregateRoot, isEntity),
-							property.GetLocation(),
-							classSymbol.Name, "SharedKernel",
-							typeSymbol.Name, referencedBc));
-						continue;
-					}
-
-					// Regla 2: BCs distintos no pueden referenciarse directamente
-					if (ownerBoundedContext != referencedBc)
-					{
-						context.ReportDiagnostic(Diagnostic.Create(
-							GetDescriptor(isAggregateRoot, isEntity),
-							property.GetLocation(),
-							classSymbol.Name, ownerBoundedContext,
-							typeSymbol.Name, referencedBc));
-					}
-				}
-			}
-
-			// DDD012: campos privados que usan tipos de otro BC (Info — acoplamiento implícito)
-			foreach (var field in classDeclaration.Members.OfType<FieldDeclarationSyntax>())
-			{
-				// Solo campos privados
-				if (!field.Modifiers.Any(m => m.IsKind(SyntaxKind.PrivateKeyword)))
-					continue;
-
-				var fieldType = context.SemanticModel.GetTypeInfo(field.Declaration.Type).Type;
-				if (fieldType == null)
-					continue;
-
-				var dddTypesToCheck = ExtractDddTypes(fieldType);
-
-				foreach (var (typeSymbol, _, _) in dddTypesToCheck)
-				{
-					var referencedBc = GetBoundedContextName(typeSymbol);
-					var referencedIsSharedKernel = typeSymbol.GetAttributes()
-						.Any(a => a.AttributeClass?.Name == "SharedKernelAttribute");
-
-					if (referencedIsSharedKernel || referencedBc == null)
+					// Mismo BC → OK
+					if (!ownerIsSharedKernel && ownerBoundedContext == referencedBc)
 						continue;
 
-					var ownerBc = ownerIsSharedKernel ? "SharedKernel" : ownerBoundedContext;
-					if (ownerBc == referencedBc)
-						continue;
-
-					foreach (var variable in field.Declaration.Variables)
+					if (isPrivateMember)
 					{
+						// DDD012 — Info: miembro privado/campo con tipo de otro BC
 						context.ReportDiagnostic(Diagnostic.Create(
 							DiagnosticDescriptors.CrossContextInternalUsage,
-							field.GetLocation(),
-							variable.Identifier.Text,
-							classSymbol.Name, ownerBc,
+							memberLocation,
+							memberName, classSymbol.Name, ownerBcLabel,
+							typeSymbol.Name, referencedBc));
+					}
+					else
+					{
+						// DDD011 — Error: miembro público con tipo de otro BC
+						context.ReportDiagnostic(Diagnostic.Create(
+							GetDescriptor(isAggregateRoot, isEntity),
+							memberLocation,
+							classSymbol.Name, ownerBcLabel,
 							typeSymbol.Name, referencedBc));
 					}
 				}

@@ -5,8 +5,16 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|-------
-DDD009 | DDD.Design | Info | Entity or AggregateRoot with public constructor should use a Factory Method
-DDD010 | DDD.Design | Warning | Entity/AggregateRoot/ValueObject must declare its Bounded Context
-DDD011 | DDD.Design | Error | No direct references between different Bounded Contexts
-DDD012 | DDD.Design | Warning | Internal private field/property uses a type from another Bounded Context
-DDD013 | DDD.Design | Error | Entity/AggregateRoot cannot have more than one [EntityId]
+DDD001 | DDD.Design | Error | Entity debe tener una propiedad con EntityId
+DDD002 | DDD.Design | Error | AggregateRoot debe tener una propiedad con EntityId
+DDD003 | DDD.Design | Error | EntityId solo puede aplicarse a propiedades
+DDD004 | DDD.Design | Warning | ValueObject debe ser inmutable
+DDD005 | DDD.Design | Error | Una clase no puede ser Entity y ValueObject simultaneamente
+DDD006 | DDD.Design | Error | Una clase no puede ser AggregateRoot y ValueObject simultaneamente
+DDD007 | DDD.Design | Warning | ValueObject debe sobrescribir Equals
+DDD008 | DDD.Design | Warning | ValueObject debe sobrescribir GetHashCode
+DDD009 | DDD.Design | Info | Entity deberia usar Factory Method
+DDD010 | DDD.Design | Warning | Tipo DDD debe declarar su Bounded Context
+DDD011 | DDD.Design | Error | No referencias directas entre Bounded Contexts
+DDD012 | DDD.Design | Warning | Uso interno de tipo de otro Bounded Context
+DDD013 | DDD.Design | Error | Entity/AggregateRoot no puede tener mas de un EntityId

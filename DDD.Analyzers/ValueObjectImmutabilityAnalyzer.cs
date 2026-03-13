@@ -44,10 +44,12 @@ namespace DDD.Analyzers
 				return;
 
 			// 1. Verificar propiedades con setters públicos (inmutabilidad)
+			// Excluimos init setters, ya que son válidos en ValueObjects (inmutables tras construcción)
 			var propertiesWithPublicSetters = classSymbol.GetMembers()
 				.OfType<IPropertySymbol>()
 				.Where(prop => prop.SetMethod != null &&
-							  prop.SetMethod.DeclaredAccessibility == Accessibility.Public);
+							  prop.SetMethod.DeclaredAccessibility == Accessibility.Public &&
+							  !prop.SetMethod.IsInitOnly);
 
 			foreach (var property in propertiesWithPublicSetters)
 			{

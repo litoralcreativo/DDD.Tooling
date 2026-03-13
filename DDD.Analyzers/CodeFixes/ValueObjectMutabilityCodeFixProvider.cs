@@ -209,8 +209,13 @@ namespace DDD.Analyzers.CodeFixes
 			}
 			else
 			{
-				// La lista tiene varios atributos → eliminar solo este
-				var newList = targetList.RemoveNode(targetAttr, SyntaxRemoveOptions.KeepLeadingTrivia);
+				// La lista tiene varios atributos → reconstruir la lista sin el atributo
+				// usando SeparatedSyntaxList para eliminar también la coma separadora
+				var remainingAttrs = targetList.Attributes
+					.Where(a => a != targetAttr);
+
+				var newSeparatedList = SyntaxFactory.SeparatedList(remainingAttrs);
+				var newList = targetList.WithAttributes(newSeparatedList);
 				newRoot = root.ReplaceNode(targetList, newList);
 			}
 

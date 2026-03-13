@@ -72,36 +72,41 @@ namespace DDD.Analyzers.CodeFixes
 			var newClassDeclaration = classDeclaration.WithMembers(newMembers)
 				.WithAdditionalAnnotations(Formatter.Annotation);
 
-			// Verificar si necesitamos agregar using DDD.Abstractions
-			var needsUsing = !root.DescendantNodes()
+			// Verificar si necesitamos agregar usings
+			var needsDddUsing = !root.DescendantNodes()
 				.OfType<UsingDirectiveSyntax>()
 				.Any(u => u.Name.ToString() == "DDD.Abstractions");
 
-			SyntaxNode newRoot;
-			if (needsUsing)
-			{
-				// Agregar using DDD.Abstractions
-				var compilationUnit = root as CompilationUnitSyntax;
-				if (compilationUnit != null)
-				{
-					var usingDirective = SyntaxFactory.UsingDirective(
-						SyntaxFactory.ParseName("DDD.Abstractions"))
-						.WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);
+			var needsSystemUsing = !root.DescendantNodes()
+				.OfType<UsingDirectiveSyntax>()
+				.Any(u => u.Name.ToString() == "System");
 
-					var newUsings = compilationUnit.Usings.Add(usingDirective);
-					compilationUnit = compilationUnit.WithUsings(newUsings);
-					newRoot = compilationUnit.ReplaceNode(
-						compilationUnit.DescendantNodes().OfType<ClassDeclarationSyntax>().First(c => c == classDeclaration),
-						newClassDeclaration);
-				}
-				else
+			// Primero reemplazamos la clase en el árbol original
+			var rootWithClass = root.ReplaceNode(classDeclaration, newClassDeclaration);
+
+			// Luego agregamos los usings si hace falta
+			SyntaxNode newRoot;
+			var compilationUnit = rootWithClass as CompilationUnitSyntax;
+			if ((needsDddUsing || needsSystemUsing) && compilationUnit != null)
+			{
+				var newUsings = compilationUnit.Usings;
+				if (needsSystemUsing)
 				{
-					newRoot = root.ReplaceNode(classDeclaration, newClassDeclaration);
+					newUsings = newUsings.Add(
+						SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("System"))
+							.WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed));
 				}
+				if (needsDddUsing)
+				{
+					newUsings = newUsings.Add(
+						SyntaxFactory.UsingDirective(SyntaxFactory.ParseName("DDD.Abstractions"))
+							.WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed));
+				}
+				newRoot = compilationUnit.WithUsings(newUsings);
 			}
 			else
 			{
-				newRoot = root.ReplaceNode(classDeclaration, newClassDeclaration);
+				newRoot = rootWithClass;
 			}
 
 			return document.WithSyntaxRoot(newRoot);

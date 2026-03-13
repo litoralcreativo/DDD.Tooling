@@ -5,12 +5,17 @@
 
 ### New Rules
 
-Rule ID | Category | Severity | Notes
---------|----------|----------|-------
-DDD001 | Design | Error | Entity must have EntityId property
-DDD002 | Design | Error | AggregateRoot must have EntityId property
-DDD004 | Design | Warning | ValueObject must be immutable
-DDD005 | Design | Error | Cannot use multiple DDD attributes simultaneously
-DDD006 | Design | Error | Cannot be Entity and AggregateRoot simultaneously
-DDD007 | Design | Warning | ValueObject must override Equals(object)
-DDD008 | Design | Warning | ValueObject must override GetHashCode()
+| Rule ID | Category | Severity | Notes                                             |
+| ------- | -------- | -------- | ------------------------------------------------- |
+| DDD001  | Design   | Error    | Entity must have EntityId property                |
+| DDD002  | Design   | Error    | AggregateRoot must have EntityId property         |
+| DDD004  | Design   | Warning  | ValueObject must be immutable                     |
+| DDD005  | Design   | Error    | Cannot use multiple DDD attributes simultaneously |
+| DDD006  | Design   | Error    | Cannot be Entity and AggregateRoot simultaneously |
+| DDD007  | Design   | Warning  | ValueObject must override Equals(object)          |
+| DDD008  | Design   | Warning  | ValueObject must override GetHashCode()           |
+
+### Code Fixes
+
+- DDD001, DDD002: Add EntityId property with [EntityId] attribute
+- DDD007, DDD008: Add Equals and GetHashCode methods with intelligent type handling

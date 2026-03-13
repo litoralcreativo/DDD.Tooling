@@ -23,11 +23,18 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 #### Code Fixes (Quick Fixes)
 
+- **DDD001/DDD002** - Agregar propiedad Id con [EntityId] automáticamente
+    - Genera propiedad `public Guid Id { get; private set; }`
+    - Agrega atributo `[EntityId]` automáticamente
+    - Agrega `using DDD.Abstractions` si no existe
+    - Posiciona la propiedad al inicio de la clase
 - **DDD007/DDD008** - Agregar Equals y GetHashCode automáticamente
     - Manejo inteligente de tipos:
         - Value types (int, decimal, DateTime) → sin operador `?.`
         - Nullable types (int?, decimal?) → con operador `?.`
         - Reference types (string, classes) → con operador `?.`
+    - Genera comparaciones para todas las propiedades públicas
+    - Implementa hash code correcto con algoritmo seguro
 
 #### Atributos DDD
 
@@ -48,6 +55,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - 📖 `README.md` - Documentación principal
 - 🚀 `QUICKSTART.md` - Guía rápida de inicio
 - 🔧 `QUICKFIX_GUIDE.md` - Guía de Quick Fixes
+- 🆔 `ENTITYID_CODEFIX.md` - Guía del Code Fix para EntityId
 - 🔍 `TYPE_HANDLING.md` - Manejo inteligente de tipos
 - 🗺️ `ROADMAP.md` - Roadmap del proyecto
 - 📝 `SUMMARY.md` - Resumen de analizadores
@@ -63,6 +71,7 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - `TestDomain/Student.cs` - Entity con EntityId
 - `TestDomain/Course.cs` - AggregateRoot con EntityId
 - `TestDomain/Examples/Price.cs` - ValueObject con tipos mixtos
+- `TestDomain/Examples/MissingEntityId.cs` - Entities sin EntityId para probar Code Fix
 - `TestDomain/Examples/InvalidValueObject.cs` - Ejemplos de errores
 - `TestDomain/Examples/IncompleteValueObject.cs` - Para testing
 
@@ -97,9 +106,10 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 #### Code Fixes
 
-- **DDD001/002** - Agregar propiedad EntityId automáticamente
 - **DDD004** - Convertir setter público a privado/init
 - **DDD005/006** - Remover atributos conflictivos
+- Opción para elegir tipo de ID (Guid, int, string, long)
+- Agregar constructor con inicialización de ID
 
 #### Mejoras
 
@@ -129,9 +139,15 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ### v1.0.0
 
-- **Analizadores**: 6 reglas (DDD001-DDD008)
-- **Code Fixes**: 1 provider (DDD007/008)
+- **Analizadores**: 6 reglas (DDD001-DDD008, excluye DDD003 sin implementar)
+- **Code Fixes**: 2 providers
+    - EntityIdCodeFixProvider (DDD001/002)
+    - ValueObjectEqualsCodeFixProvider (DDD007/008)
 - **Atributos**: 4 (Entity, EntityId, AggregateRoot, ValueObject)
+- **Ejemplos**: 8 archivos de ejemplo
+- **Documentación**: 12 archivos markdown
+- **Líneas de código**: ~2,000 líneas
+- **Cobertura**: Reglas básicas de DDD + Code Fixes automáticos
 - **Ejemplos**: 7 archivos de ejemplo
 - **Documentación**: 11 archivos markdown
 - **Líneas de código**: ~1,500 líneas

@@ -1,5 +1,6 @@
 using DDD.Abstractions;
 using System;
+using System.Collections.Generic;
 using TestDomain.Catalog;
 using TestDomain.SharedKernel;
 

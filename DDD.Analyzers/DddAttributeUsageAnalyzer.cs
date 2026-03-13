@@ -18,6 +18,7 @@ namespace DDD.Analyzers
 	{
 		public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
 			ImmutableArray.Create(
+				DiagnosticDescriptors.EntityIdOnlyOnProperties,
 				DiagnosticDescriptors.CannotBeEntityAndValueObject,
 				DiagnosticDescriptors.CannotBeAggregateRootAndValueObject);
 
@@ -26,7 +27,33 @@ namespace DDD.Analyzers
 			context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
 			context.EnableConcurrentExecution();
 
+			context.RegisterSyntaxNodeAction(AnalyzeFieldDeclaration, SyntaxKind.FieldDeclaration);
 			context.RegisterSyntaxNodeAction(AnalyzeClassDeclaration, SyntaxKind.ClassDeclaration);
+		}
+
+		private void AnalyzeFieldDeclaration(SyntaxNodeAnalysisContext context)
+		{
+			var fieldDeclaration = (FieldDeclarationSyntax)context.Node;
+
+			// Verificar si alguna variable del campo tiene [EntityId]
+			var hasEntityIdAttribute = fieldDeclaration.AttributeLists
+				.SelectMany(al => al.Attributes)
+				.Any(attr =>
+				{
+					var name = attr.Name.ToString();
+					return name == "EntityId" || name == "EntityIdAttribute";
+				});
+
+			if (!hasEntityIdAttribute) return;
+
+			// Reportar en cada variable declarada en el campo
+			foreach (var variable in fieldDeclaration.Declaration.Variables)
+			{
+				context.ReportDiagnostic(Diagnostic.Create(
+					DiagnosticDescriptors.EntityIdOnlyOnProperties,
+					fieldDeclaration.GetLocation(),
+					variable.Identifier.Text));
+			}
 		}
 
 		private void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)

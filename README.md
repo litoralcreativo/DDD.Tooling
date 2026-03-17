@@ -9,14 +9,14 @@ Proporcionar validación en tiempo de compilación de las reglas y patrones de D
 ## ✨ Características
 
 - ✅ **13 Reglas** de análisis DDD (DDD001-DDD013)
-- ✅ **7 Code Fix Providers** para corregir automáticamente errores/warnings
+- ✅ **6 Code Fix Providers** para corregir automáticamente errores/warnings
 - ✅ **Sugerencias educativas (Info)** para mejorar el diseño
 - ✅ **Manejo inteligente de tipos** (detecta automáticamente structs, nullables, referencias)
 - ✅ **Detección de referencias cruzadas** entre Bounded Contexts (DDD010-DDD012)
 - ✅ **Soporte para colecciones genéricas** (`List<T>`, `IReadOnlyCollection<T>`, etc.)
 - ✅ **Validación en tiempo real** en el IDE
 - ✅ **Errores, Warnings e Infos claros** con mensajes descriptivos
-- ✅ **Fácil integración** vía NuGet (próximamente)
+- ✅ **Fácil integración** vía NuGet (`DDD.Tooling.Analyzers`)
 
 ## 📦 Estructura del Proyecto
 
@@ -44,11 +44,10 @@ DDD.Tooling/
 │       ├── EntityIdCodeFixProvider.cs                # Fix para DDD001/002
 │       ├── EntityIdOnPropertyCodeFixProvider.cs      # Fix para DDD003
 │       ├── ValueObjectMutabilityCodeFixProvider.cs   # Fix para DDD004/005/006
-│       ├── ValueObjectEqualsCodeFixProvider.cs       # Fix para DDD007/008
 │       ├── EntityFactoryMethodCodeFixProvider.cs     # Fix para DDD009
 │       ├── BoundedContextDeclarationCodeFixProvider.cs # Fix para DDD010
 │       └── CrossBoundedContextReferenceCodeFixProvider.cs # Fix para DDD011
-├── DDD.Analyzers.Tests/        # Tests unitarios (74 tests)
+├── DDD.Analyzers.Tests/        # Tests unitarios (72 tests)
 │   ├── Analyzers/              # Tests DDD001–DDD013
 │   ├── CodeFixes/              # Tests de Code Fixes
 │   └── Helpers/
@@ -168,7 +167,7 @@ public class Money
 
 **Descripción**: Los ValueObjects deben compararse por valor, por lo que deben sobrescribir `Equals(object)`.
 
-**Quick Fix disponible**: Genera `Equals` con comparación de todas las propiedades públicas.
+> Sin Quick Fix — los IDEs modernos (Visual Studio, Rider) ofrecen generar `Equals` y `GetHashCode` automáticamente con mejor resultado.
 
 ---
 
@@ -176,7 +175,7 @@ public class Money
 
 **Descripción**: Los ValueObjects deben sobrescribir `GetHashCode` de forma consistente con `Equals`.
 
-**Quick Fix disponible**: Genera `GetHashCode` con manejo inteligente de tipos (value types, nullables, referencias).
+> Sin Quick Fix — los IDEs modernos (Visual Studio, Rider) ofrecen generar `Equals` y `GetHashCode` automáticamente con mejor resultado.
 
 ---
 
@@ -428,9 +427,9 @@ El proyecto `TestDomain` contiene ejemplos de uso correcto e incorrecto, organiz
 ## 🎯 Estado del Proyecto
 
 - ✅ **13 reglas** implementadas y testeadas (DDD001–DDD013)
-- ✅ **7 Code Fix Providers** implementados y testeados
-- ✅ **74 tests unitarios** — 100% verdes (55 analyzer + 19 codefix)
-- 🚧 **Publicación NuGet** — próximamente en NuGet.org
+- ✅ **6 Code Fix Providers** implementados y testeados
+- ✅ **72 tests unitarios** — 100% verdes (55 analyzer + 17 codefix)
+- ✅ **Publicado en NuGet.org** — [`DDD.Tooling.Abstractions`](https://www.nuget.org/packages/DDD.Tooling.Abstractions) · [`DDD.Tooling.Analyzers`](https://www.nuget.org/packages/DDD.Tooling.Analyzers)
 
 ## 📄 Licencia
 

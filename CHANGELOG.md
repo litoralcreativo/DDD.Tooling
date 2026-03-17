@@ -18,6 +18,14 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [1.0.1] - 2026-03-17
+
+### 🔧 Cambiado
+
+- **DDD007/008** — Eliminado `ValueObjectEqualsCodeFixProvider`: el Code Fix generado era incorrecto (no comparaba las propiedades en `Equals`, y `GetHashCode` devolvía siempre el mismo valor). DDD007 y DDD008 permanecen como **warnings sin Quick Fix** — los IDEs modernos (Visual Studio, Rider) ofrecen generar `Equals` y `GetHashCode` con resultados correctos.
+
+---
+
 ## [1.0.0] - 2026-03-13
 
 Primera release pública. Publicada en NuGet.org como:
@@ -64,7 +72,7 @@ Primera release pública. Publicada en NuGet.org como:
 - **DDD004/005/006** — `ValueObjectMutabilityCodeFixProvider`:
     - DDD004: convierte setter público en `private set`
     - DDD005/006: elimina el atributo conflictivo de la clase
-- **DDD007/008** — `ValueObjectEqualsCodeFixProvider`: genera `Equals` y `GetHashCode` con manejo inteligente de tipos (value types, nullables, reference types)
+- **DDD007/008** — DDD007 y DDD008 son warnings sin Quick Fix (ver v1.0.1)
 - **DDD009** — `EntityFactoryMethodCodeFixProvider` con 3 escenarios:
     - Constructor público sin factory method → hace privado el constructor + agrega `Create` estático
     - Constructor privado/internal sin factory method → agrega `Create` estático
@@ -77,9 +85,7 @@ Primera release pública. Publicada en NuGet.org como:
 
 #### Tests
 
-- **74 tests unitarios** (100% verdes)
-    - 55 tests de analizadores (DDD001–DDD013) con `Microsoft.CodeAnalysis.CSharp.Analyzer.Testing v1.1.2`
-    - 19 tests de Code Fixes (DDD001–DDD011) con `Microsoft.CodeAnalysis.CSharp.CodeFix.Testing v1.1.2`
+- **74 tests unitarios** (100% verdes) — ver v1.0.1 para estado actualizado
 
 #### Infraestructura
 
@@ -122,4 +128,4 @@ Usamos [Conventional Commits](https://www.conventionalcommits.org/):
 
 ---
 
-**Última actualización**: 13 de Marzo 2026
+**Última actualización**: 17 de Marzo 2026

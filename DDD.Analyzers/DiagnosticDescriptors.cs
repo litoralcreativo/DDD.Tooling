@@ -143,5 +143,32 @@ namespace DDD.Analyzers
 			defaultSeverity: DiagnosticSeverity.Error,
 			isEnabledByDefault: true,
 			description: "En DDD, una Entity o AggregateRoot se identifica por una única identidad. Tener múltiples [EntityId] es un anti-patrón: elige uno como identificador principal y elimina el atributo de los demás.");
+
+		public static readonly DiagnosticDescriptor DomainEventMustBeImmutable = new DiagnosticDescriptor(
+			id: "DDD014",
+			title: "DomainEvent debe ser inmutable",
+			messageFormat: "La propiedad '{0}' en el DomainEvent '{1}' tiene un setter público. Los DomainEvents deben ser inmutables.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Error,
+			isEnabledByDefault: true,
+			description: "Los Domain Events representan hechos ocurridos y no deben modificarse una vez creados. Usa solo getters o accessors 'init'.");
+
+		public static readonly DiagnosticDescriptor DomainEventMustHaveOccurredOn = new DiagnosticDescriptor(
+			id: "DDD015",
+			title: "DomainEvent debe tener propiedad OccurredOn",
+			messageFormat: "El DomainEvent '{0}' no tiene una propiedad 'OccurredOn' de tipo DateTime o DateTimeOffset. Los DomainEvents deben registrar cuándo ocurrieron.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Warning,
+			isEnabledByDefault: true,
+			description: "Todo Domain Event debe incluir una propiedad 'OccurredOn' de tipo DateTime o DateTimeOffset para registrar el momento exacto en que ocurrió el evento.");
+
+		public static readonly DiagnosticDescriptor DomainEventMustDeclareBoundedContext = new DiagnosticDescriptor(
+			id: "DDD016",
+			title: "DomainEvent debe declarar su Bounded Context",
+			messageFormat: "El DomainEvent '{0}' no declara su Bounded Context. Usa [BoundedContext(\"NombreBC\")] para indicar a qué contexto pertenece.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Warning,
+			isEnabledByDefault: true,
+			description: "Los Domain Events deben declarar a qué Bounded Context pertenecen mediante [BoundedContext(\"NombreBC\")] para facilitar el análisis de dependencias entre contextos.");
 	}
 }

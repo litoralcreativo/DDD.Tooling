@@ -16,12 +16,13 @@ namespace DDD.Analyzers.CodeFixes
 	/// Code Fix para DDD010: ofrece dos opciones al desarrollador:
 	/// 1. Agregar [BoundedContext("NombreBC")] inferido desde el namespace
 	/// 2. Agregar [SharedKernel]
+	/// Code Fix para DDD016: mismo comportamiento para DomainEvents.
 	/// </summary>
 	[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(BoundedContextDeclarationCodeFixProvider)), Shared]
 	public class BoundedContextDeclarationCodeFixProvider : CodeFixProvider
 	{
 		public sealed override ImmutableArray<string> FixableDiagnosticIds =>
-			ImmutableArray.Create("DDD010");
+			ImmutableArray.Create("DDD010", "DDD016");
 
 		public sealed override FixAllProvider GetFixAllProvider() =>
 			WellKnownFixAllProviders.BatchFixer;

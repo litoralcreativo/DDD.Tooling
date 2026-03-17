@@ -9,12 +9,27 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [Unreleased]
 
-### 🎯 Planeado para v1.1.0
+---
 
-#### CI/CD
+## [1.1.0] - 2026-03-22
 
-- GitHub Actions para build + test en cada PR
-- GitHub Actions para publicar NuGet automáticamente en cada release tag
+### ✨ Agregado
+
+#### Atributo DDD (`DDD.Tooling.Abstractions`)
+
+- `[DomainEvent]` — Marca clases como Domain Events DDD. Activa las reglas DDD014, DDD015 y DDD016.
+
+#### Reglas de análisis (`DDD.Tooling.Analyzers`)
+
+- **DDD014** (`Error`) — `DomainEvent` debe ser inmutable: todas las propiedades deben tener `get` sin setter público (se permiten `private set` e `init`).
+- **DDD015** (`Warning`) — `DomainEvent` debe tener una propiedad `OccurredOn` de tipo `DateTime` o `DateTimeOffset`.
+- **DDD016** (`Warning`) — `DomainEvent` debe declarar su `Bounded Context` con `[BoundedContext("Nombre")]` o `[SharedKernel]`.
+
+#### Code Fixes
+
+- **DDD014** — `DomainEventImmutabilityCodeFixProvider`: convierte el setter público a `private set` o `init` (C# 9+).
+- **DDD015** — `DomainEventOccurredOnCodeFixProvider`: agrega automáticamente `public DateTime OccurredOn { get; }` como primer miembro. Añade `using System;` si no existe.
+- **DDD016** — `BoundedContextDeclarationCodeFixProvider` extendido: ahora también maneja `DomainEvent` (aplica `[BoundedContext("BC")]` o `[SharedKernel]` inferido del namespace).
 
 ---
 

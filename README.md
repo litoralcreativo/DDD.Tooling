@@ -8,11 +8,12 @@ Proporcionar validación en tiempo de compilación de las reglas y patrones de D
 
 ## ✨ Características
 
-- ✅ **13 Reglas** de análisis DDD (DDD001-DDD013)
-- ✅ **6 Code Fix Providers** para corregir automáticamente errores/warnings
+- ✅ **16 Reglas** de análisis DDD (DDD001-DDD016)
+- ✅ **9 Code Fix Providers** para corregir automáticamente errores/warnings
 - ✅ **Sugerencias educativas (Info)** para mejorar el diseño
 - ✅ **Manejo inteligente de tipos** (detecta automáticamente structs, nullables, referencias)
 - ✅ **Detección de referencias cruzadas** entre Bounded Contexts (DDD010-DDD012)
+- ✅ **Soporte para Domain Events** con validaciones de inmutabilidad y ciclo de vida (DDD014-DDD016)
 - ✅ **Soporte para colecciones genéricas** (`List<T>`, `IReadOnlyCollection<T>`, etc.)
 - ✅ **Validación en tiempo real** en el IDE
 - ✅ **Errores, Warnings e Infos claros** con mensajes descriptivos
@@ -29,7 +30,8 @@ DDD.Tooling/
 │       ├── AggregateRootAttribute.cs
 │       ├── ValueObjectAttribute.cs
 │       ├── BoundedContextAttribute.cs
-│       └── SharedKernelAttribute.cs
+│       ├── SharedKernelAttribute.cs
+│       └── DomainEventAttribute.cs
 ├── DDD.Analyzers/              # Analizadores Roslyn
 │   ├── DiagnosticDescriptors.cs
 │   ├── EntityMustHaveEntityIdAnalyzer.cs             # DDD001
@@ -40,15 +42,18 @@ DDD.Tooling/
 │   ├── BoundedContextDeclarationAnalyzer.cs          # DDD010
 │   ├── CrossBoundedContextReferenceAnalyzer.cs       # DDD011, DDD012
 │   ├── MultipleEntityIdAnalyzer.cs                   # DDD013
+│   ├── DomainEventAnalyzer.cs                        # DDD014, DDD015, DDD016
 │   └── CodeFixes/
 │       ├── EntityIdCodeFixProvider.cs                # Fix para DDD001/002
 │       ├── EntityIdOnPropertyCodeFixProvider.cs      # Fix para DDD003
 │       ├── ValueObjectMutabilityCodeFixProvider.cs   # Fix para DDD004/005/006
 │       ├── EntityFactoryMethodCodeFixProvider.cs     # Fix para DDD009
-│       ├── BoundedContextDeclarationCodeFixProvider.cs # Fix para DDD010
-│       └── CrossBoundedContextReferenceCodeFixProvider.cs # Fix para DDD011
-├── DDD.Analyzers.Tests/        # Tests unitarios (72 tests)
-│   ├── Analyzers/              # Tests DDD001–DDD013
+│       ├── BoundedContextDeclarationCodeFixProvider.cs # Fix para DDD010/016
+│       ├── CrossBoundedContextReferenceCodeFixProvider.cs # Fix para DDD011
+│       ├── DomainEventImmutabilityCodeFixProvider.cs # Fix para DDD014
+│       └── DomainEventOccurredOnCodeFixProvider.cs   # Fix para DDD015
+├── DDD.Analyzers.Tests/        # Tests unitarios (91 tests)
+│   ├── Analyzers/              # Tests DDD001–DDD016
 │   ├── CodeFixes/              # Tests de Code Fixes
 │   └── Helpers/
 │       └── AnalyzerTestHelper.cs
@@ -335,6 +340,69 @@ public class Product
 
 ---
 
+### DDD014 - DomainEvent debe ser inmutable ❌ Error
+
+**Descripción**: Las clases decoradas con `[DomainEvent]` no deben tener setters públicos. Los Domain Events son registros históricos inmutables.
+
+**Quick Fix disponible**: Convierte el setter público a `private set` o `init` (C# 9+).
+
+**Ejemplo incorrecto:**
+
+```csharp
+[DomainEvent]
+[BoundedContext("Catalog")]
+public class CoursePublishedEvent
+{
+    public string Title { get; set; }  // ❌ DDD014: setter público
+    public DateTime OccurredOn { get; }
+}
+```
+
+**Ejemplo correcto:**
+
+```csharp
+[DomainEvent]
+[BoundedContext("Catalog")]
+public class CoursePublishedEvent
+{
+    public string Title { get; }       // ✅ Solo getter
+    public DateTime OccurredOn { get; }
+}
+```
+
+---
+
+### DDD015 - DomainEvent debe tener propiedad OccurredOn ⚠️ Warning
+
+**Descripción**: Los Domain Events deben registrar cuándo ocurrieron. Se requiere una propiedad `OccurredOn` de tipo `DateTime` o `DateTimeOffset`.
+
+**Quick Fix disponible**: Agrega `public DateTime OccurredOn { get; }` como primer miembro. Añade `using System;` si falta.
+
+```csharp
+// ⚠️ DDD015: falta OccurredOn
+[DomainEvent]
+[BoundedContext("Catalog")]
+public class CoursePublishedEvent { }
+
+// ✅ Correcto:
+[DomainEvent]
+[BoundedContext("Catalog")]
+public class CoursePublishedEvent
+{
+    public DateTime OccurredOn { get; }
+}
+```
+
+---
+
+### DDD016 - DomainEvent debe declarar su Bounded Context ⚠️ Warning
+
+**Descripción**: Los Domain Events, al igual que el resto de tipos DDD, deben declarar a qué Bounded Context pertenecen con `[BoundedContext("Nombre")]` o `[SharedKernel]`.
+
+**Quick Fix disponible**: `BoundedContextDeclarationCodeFixProvider` (extendido para soportar `[DomainEvent]`).
+
+---
+
 ## 🚀 Uso
 
 ### 1. Instalar las abstracciones
@@ -426,9 +494,9 @@ El proyecto `TestDomain` contiene ejemplos de uso correcto e incorrecto, organiz
 
 ## 🎯 Estado del Proyecto
 
-- ✅ **13 reglas** implementadas y testeadas (DDD001–DDD013)
-- ✅ **6 Code Fix Providers** implementados y testeados
-- ✅ **72 tests unitarios** — 100% verdes (55 analyzer + 17 codefix)
+- ✅ **16 reglas** implementadas y testeadas (DDD001–DDD016)
+- ✅ **9 Code Fix Providers** implementados y testeados
+- ✅ **91 tests unitarios** — 100% verdes (68 analyzer + 23 codefix)
 - ✅ **Publicado en NuGet.org** — [`DDD.Tooling.Abstractions`](https://www.nuget.org/packages/DDD.Tooling.Abstractions) · [`DDD.Tooling.Analyzers`](https://www.nuget.org/packages/DDD.Tooling.Analyzers)
 
 ## 📄 Licencia

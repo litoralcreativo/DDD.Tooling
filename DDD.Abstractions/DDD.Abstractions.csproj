@@ -11,15 +11,15 @@
   <PropertyGroup>
     <!-- Identidad del paquete -->
     <PackageId>DDD.Tooling.Abstractions</PackageId>
-    <Version>1.0.1</Version>
+    <Version>1.1.0</Version>
     <Authors>Gaston Chatelet</Authors>
     <Owners>Gaston Chatelet</Owners>
     <Copyright>Copyright (c) 2026 Gaston Chatelet</Copyright>
 
     <!-- Descripcion y etiquetas -->
     <Description>Atributos base para Domain-Driven Design (DDD) en proyectos .NET: [Entity], [AggregateRoot], [ValueObject], [EntityId], [BoundedContext], [SharedKernel]. Companion package de DDD.Tooling.Analyzers.</Description>
-    <PackageTags>ddd;domain-driven-design;entity;aggregateroot;valueobject;bounded-context;attributes</PackageTags>
-    <PackageReleaseNotes>v1.0.0 - Primera version publica. Atributos DDD base.</PackageReleaseNotes>
+    <PackageTags>ddd;domain-driven-design;entity;aggregateroot;valueobject;bounded-context;attributes;domain-event</PackageTags>
+    <PackageReleaseNotes>v1.1.0 - Nuevo atributo [DomainEvent] para marcar Domain Events DDD. Companion: DDD.Tooling.Analyzers 1.1.0 con reglas DDD014/DDD015/DDD016.</PackageReleaseNotes>
 
     <!-- Licencia y URLs -->
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

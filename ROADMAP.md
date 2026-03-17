@@ -49,35 +49,41 @@
     - [x] Fase 4 — Tests de Code Fixes para DDD001–DDD011 (19 tests adicionales, todos verdes)
     - [x] Stack: xUnit + `Microsoft.CodeAnalysis.CSharp.Analyzer.Testing` + `Microsoft.CodeAnalysis.CSharp.CodeFix.Testing`
 
+## ✅ Implementado (v1.4) — DomainEvent
+
+- [x] **`[DomainEvent]`** — Nuevo atributo en `DDD.Tooling.Abstractions` para marcar Domain Events
+- [x] **DDD014** — DomainEvent debe ser inmutable (sin setters públicos) ❌ Error
+    - [x] Code Fix: convierte setter público a `private set` o `init` (C# 9+)
+- [x] **DDD015** — DomainEvent debe tener propiedad `OccurredOn` (`DateTime`/`DateTimeOffset`) ⚠️ Warning
+    - [x] Code Fix: agrega `public DateTime OccurredOn { get; }` automáticamente
+    - [x] Code Fix añade `using System;` si no existe
+- [x] **DDD016** — DomainEvent debe declarar su Bounded Context ⚠️ Warning
+    - [x] Code Fix: `BoundedContextDeclarationCodeFixProvider` extendido (soporta `[DomainEvent]`)
+- [x] **91 tests unitarios** (91/91 verdes) — 17 tests nuevos para DDD014/015/016
+    - [x] Publicado en NuGet.org como `DDD.Tooling.Abstractions 1.1.0` + `DDD.Tooling.Analyzers 1.1.0`
+
 ## 🚧 Próximas Implementaciones
-
-### Packaging NuGet
-
-- [ ] Configurar `DDD.Abstractions.csproj` para publicar `DDD.Tooling.Abstractions`
-- [ ] Configurar `DDD.Analyzers.csproj` para publicar `DDD.Tooling.Analyzers`
-- [ ] Publicar en NuGet.org
-- [ ] Logo y branding
 
 ### CI/CD
 
 - [ ] GitHub Actions para build + test en cada PR
-- [ ] GitHub Actions para publicar NuGet en cada release
+- [ ] GitHub Actions para publicar NuGet automáticamente en cada release tag
 
 ### Documentación adicional
 
 - [ ] Wiki con patrones DDD comunes
 - [ ] Video tutoriales
 
-### Fase 4 - Integración con IDEs
+### Fase 5 - Integración con IDEs
 
 - [ ] Snippets para VS Code
 - [ ] Snippets para Visual Studio
-- [ ] Plantillas de Item Templates para Entity, ValueObject, AggregateRoot
+- [ ] Plantillas de Item Templates para Entity, ValueObject, AggregateRoot, DomainEvent
 - [ ] Extension VS Code con comandos personalizados
 
-### Fase 5 - Analizadores Adicionales
+### Fase 6 - Analizadores Adicionales
 
-#### DDD014 - Repository pattern
+#### DDD017 - Repository pattern
 
 ```csharp
 // Validar que los repositorios solo trabajen con AggregateRoots
@@ -87,7 +93,7 @@ public interface IProductRepository  // ⚠️ Warning: Product no es AggregateR
 }
 ```
 
-### Fase 6 - Características Avanzadas
+### Fase 7 - Características Avanzadas
 
 - [ ] Análisis de dependencias entre Aggregates
 - [ ] Detector de Anemic Domain Model
@@ -113,4 +119,4 @@ public interface IProductRepository  // ⚠️ Warning: Product no es AggregateR
 
 ---
 
-**Última actualización**: Marzo 2026
+**Última actualización**: 17 de Marzo 2026

@@ -35,6 +35,9 @@ namespace DDD.Abstractions
 
     [System.AttributeUsage(System.AttributeTargets.Class)]
     public class SharedKernelAttribute : System.Attribute { }
+
+    [System.AttributeUsage(System.AttributeTargets.Class)]
+    public class DomainEventAttribute : System.Attribute { }
 }
 ";
     }

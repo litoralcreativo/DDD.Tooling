@@ -76,12 +76,25 @@ namespace DDD.Analyzers.CodeFixes
 
 				if (!hasSystemUsing)
 				{
+					// Heredar la leading trivia del primer using para mantener el formato
+					var firstUsing = compilationUnit.Usings.FirstOrDefault();
+					var leadingTrivia = firstUsing?.GetLeadingTrivia() ?? default;
+
 					var systemUsing = SyntaxFactory
 						.UsingDirective(SyntaxFactory.ParseName("System"))
+						.WithLeadingTrivia(leadingTrivia)
 						.WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);
 
+					// Al primer using existente le quitamos la leading trivia (ahora la tiene el nuevo)
+					var newUsings = compilationUnit.Usings;
+					if (firstUsing != null)
+					{
+						var trimmedFirst = firstUsing.WithLeadingTrivia(SyntaxFactory.TriviaList());
+						newUsings = newUsings.Replace(firstUsing, trimmedFirst);
+					}
+
 					rootWithClass = compilationUnit.WithUsings(
-						compilationUnit.Usings.Insert(0, systemUsing));
+						newUsings.Insert(0, systemUsing));
 				}
 			}
 
@@ -90,8 +103,21 @@ namespace DDD.Analyzers.CodeFixes
 
 		private static PropertyDeclarationSyntax GenerateOccurredOnProperty()
 		{
-			const string code = "\n\tpublic DateTime OccurredOn { get; }\n";
-			return SyntaxFactory.ParseMemberDeclaration(code) as PropertyDeclarationSyntax;
+			// Construimos la propiedad con SyntaxFactory para evitar problemas de trivia (LF vs CRLF)
+			var getter = SyntaxFactory.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+				.WithSemicolonToken(SyntaxFactory.Token(SyntaxKind.SemicolonToken));
+
+			var accessorList = SyntaxFactory.AccessorList(
+				SyntaxFactory.List(new[] { getter }));
+
+			return SyntaxFactory.PropertyDeclaration(
+					SyntaxFactory.ParseTypeName("DateTime").WithTrailingTrivia(SyntaxFactory.Space),
+					SyntaxFactory.Identifier("OccurredOn"))
+				.WithModifiers(SyntaxFactory.TokenList(
+					SyntaxFactory.Token(SyntaxKind.PublicKeyword).WithTrailingTrivia(SyntaxFactory.Space)))
+				.WithAccessorList(accessorList)
+				.WithLeadingTrivia(SyntaxFactory.Whitespace("\t\t"))
+				.WithTrailingTrivia(SyntaxFactory.CarriageReturnLineFeed);
 		}
 	}
 }

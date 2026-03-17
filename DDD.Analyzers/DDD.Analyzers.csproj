@@ -16,7 +16,7 @@
   <PropertyGroup>
     <!-- Identidad del paquete -->
     <PackageId>DDD.Tooling.Analyzers</PackageId>
-    <Version>1.0.0</Version>
+    <Version>1.0.1</Version>
     <Authors>Gaston Chatelet</Authors>
     <Owners>Gaston Chatelet</Owners>
     <Copyright>Copyright (c) 2026 Gaston Chatelet</Copyright>

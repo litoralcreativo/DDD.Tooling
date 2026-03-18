@@ -1,6 +1,17 @@
 ﻿; Shipped analyzer releases
 ; https://github.com/dotnet/roslyn-analyzers/blob/main/src/Microsoft.CodeAnalysis.Analyzers/ReleaseTrackingAnalyzers.Help.md
 
+## Release 1.2.0
+
+### New Rules
+
+Rule ID | Category | Severity | Notes
+--------|----------|----------|---------
+DDD017 | DDD.Design | Error | AggregateRoot debe implementar IAggregateRoot&lt;TId&gt;
+DDD018 | DDD.Design | Error | Entity debe implementar IEntity&lt;TId&gt;
+DDD019 | DDD.Design | Error | DomainEvent debe implementar IDomainEvent
+DDD020 | DDD.Design | Error | ValueObject debe heredar de ValueObject base class
+
 ## Release 1.1.0
 
 ### New Rules

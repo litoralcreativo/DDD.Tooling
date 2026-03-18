@@ -16,15 +16,15 @@
   <PropertyGroup>
     <!-- Identidad del paquete -->
     <PackageId>DDD.Tooling.Analyzers</PackageId>
-    <Version>1.1.0</Version>
+    <Version>1.2.0</Version>
     <Authors>Gaston Chatelet</Authors>
     <Owners>Gaston Chatelet</Owners>
     <Copyright>Copyright (c) 2026 Gaston Chatelet</Copyright>
 
     <!-- Descripcion y etiquetas -->
-    <Description>Roslyn analyzers para validar reglas de Domain-Driven Design (DDD) en proyectos .NET. Incluye 13 reglas con Code Fixes automaticos para Entity, AggregateRoot, ValueObject y Bounded Contexts.</Description>
-    <PackageTags>ddd;domain-driven-design;roslyn;analyzer;codefix;entity;aggregateroot;valueobject;bounded-context</PackageTags>
-    <PackageReleaseNotes>v1.1.0 - Soporte para Domain Events: DDD014 (inmutabilidad), DDD015 (OccurredOn), DDD016 (BoundedContext). 3 nuevos Code Fix Providers. Requiere DDD.Tooling.Abstractions 1.1.0.</PackageReleaseNotes>
+    <Description>Roslyn analyzers para validar reglas de Domain-Driven Design (DDD) en proyectos .NET. Incluye 24 reglas con Code Fixes automaticos para Entity, AggregateRoot, ValueObject, DomainEvents y Bounded Contexts.</Description>
+    <PackageTags>ddd;domain-driven-design;roslyn;analyzer;codefix;entity;aggregateroot;valueobject;bounded-context;domainevent</PackageTags>
+    <PackageReleaseNotes>v1.2.0 - Runtime support: IDomainEvent, IEntity&lt;TId&gt;, IAggregateRoot&lt;TId&gt;, Entity&lt;TId&gt;, AggregateRoot&lt;TId&gt;, ValueObject base classes. 4 nuevos analizadores (DDD017-DDD020) + 4 Code Fixes. Herencia automática detectada en DDD001/002/007/008. Requiere DDD.Tooling.Abstractions 1.2.0.</PackageReleaseNotes>
 
     <!-- Licencia y URLs -->
     <PackageLicenseExpression>MIT</PackageLicenseExpression>

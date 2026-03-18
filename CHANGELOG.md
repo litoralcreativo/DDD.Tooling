@@ -11,6 +11,50 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [1.2.0] - 2026-03-25
+
+### ✨ Agregado
+
+#### Runtime Support (`DDD.Tooling.Abstractions`)
+
+- **Interfaces fundamentales:**
+    - `IDomainEvent` — Contrato para Domain Events con propiedad `OccurredOn: DateTime`.
+    - `IEntity<TId>` — Contrato genérico para entidades con `Id: TId`.
+    - `IAggregateRoot<TId>` — Contrato para agregados (extiende `IEntity<TId>`), con `DomainEvents: List<IDomainEvent>` y método `ClearDomainEvents()`.
+
+- **Base classes:**
+    - `Entity<TId>` — Implementación base de igualdad por `Id`, operadores `==`/`!=`, virtual properties.
+    - `AggregateRoot<TId>` — Extiende `Entity<TId>`, proporciona `RaiseDomainEvent()` protegido y seguimiento de eventos de dominio.
+    - `ValueObject` — Base para Value Objects, igualdad por componentes, método abstracto `GetEqualityComponents()`.
+
+#### Nuevas Reglas de análisis (`DDD.Tooling.Analyzers`)
+
+- **DDD017** (`Error`) — `AggregateRoot` debe implementar `IAggregateRoot<TId>` o heredar de `AggregateRoot<TId>`.
+- **DDD018** (`Error`) — `Entity` debe implementar `IEntity<TId>` o heredar de `Entity<TId>`.
+- **DDD019** (`Error`) — `DomainEvent` debe implementar `IDomainEvent`.
+- **DDD020** (`Error`) — `ValueObject` debe heredar de la base class `ValueObject`.
+
+#### Code Fixes
+
+- `AggregateRootInheritanceCodeFixProvider` (DDD017) — Agrega `: AggregateRoot<Guid>`.
+- `EntityInheritanceCodeFixProvider` (DDD018) — Agrega `: Entity<Guid>`.
+- `DomainEventInterfaceCodeFixProvider` (DDD019) — Agrega `: IDomainEvent`.
+- `ValueObjectInheritanceCodeFixProvider` (DDD020) — Agrega `: ValueObject`.
+
+### 🔧 Mejorado
+
+#### Detección de Herencia (`DDD.Tooling.Analyzers`)
+
+- **DDD001** y **DDD002** — Ahora detectan automáticamente herencia de `Entity<TId>` y `AggregateRoot<TId>`. El atributo `[EntityId]` es opcional si la clase ya hereda de las base classes.
+- **DDD007** y **DDD008** — Validan `Equals()` y `GetHashCode()` solo si no heredan de `ValueObject` (la base class proporciona implementación automática).
+
+### 📦 Cambios de Dependencias
+
+- `DDD.Tooling.Abstractions` 1.2.0: sin dependencias externas.
+- `DDD.Tooling.Analyzers` 1.2.0: requiere `DDD.Tooling.Abstractions 1.2.0`.
+
+---
+
 ## [1.1.0] - 2026-03-22
 
 ### ✨ Agregado

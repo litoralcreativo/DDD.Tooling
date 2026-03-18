@@ -2,16 +2,22 @@
 
 ## ⚡ Inicio Rápido en 5 Minutos
 
-### Paso 1: Agrega las referencias (30 segundos)
+### Paso 1: Agrega los paquetes NuGet (30 segundos)
 
-En tu proyecto `.csproj`:
+```bash
+dotnet add package DDD.Tooling.Abstractions
+dotnet add package DDD.Tooling.Analyzers
+```
+
+O en tu proyecto `.csproj`:
 
 ```xml
 <ItemGroup>
-  <ProjectReference Include="..\DDD.Abstractions\DDD.Abstractions.csproj" />
-  <ProjectReference Include="..\DDD.Analyzers\DDD.Analyzers.csproj"
-                    OutputItemType="Analyzer"
-                    ReferenceOutputAssembly="false" />
+  <PackageReference Include="DDD.Tooling.Abstractions" Version="1.2.0" />
+  <PackageReference Include="DDD.Tooling.Analyzers" Version="1.2.0">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+  </PackageReference>
 </ItemGroup>
 ```
 
@@ -163,14 +169,18 @@ public class ShoppingCart
 
 ---
 
-## 🔍 Cheatsheet de Atributos
+## 🔍 Cheatsheet de Atributos y Base Classes
 
-| Atributo          | Uso                  | Requiere EntityId | Debe ser Inmutable  |
-| ----------------- | -------------------- | ----------------- | ------------------- |
-| `[Entity]`        | Clase con identidad  | ✅ Sí             | ❌ No               |
-| `[AggregateRoot]` | Raíz de agregado     | ✅ Sí             | ❌ No               |
-| `[ValueObject]`   | Objeto sin identidad | ❌ No             | ✅ Sí (recomendado) |
-| `[EntityId]`      | Identificador único  | N/A               | ❌ No               |
+| Atributo / Base class | Uso                    | Requiere EntityId | Debe ser Inmutable  |
+| --------------------- | ---------------------- | ----------------- | ------------------- |
+| `[Entity]`            | Clase con identidad    | ✅ Sí             | ❌ No               |
+| `Entity<TId>`         | Base class para Entity | automático        | ❌ No               |
+| `[AggregateRoot]`     | Raíz de agregado       | ✅ Sí             | ❌ No               |
+| `AggregateRoot<TId>`  | Base class para AR     | automático        | ❌ No               |
+| `[ValueObject]`       | Objeto sin identidad   | ❌ No             | ✅ Sí (recomendado) |
+| `ValueObject`         | Base class para VO     | ❌ No             | ✅ Sí (recomendado) |
+| `[EntityId]`          | Identificador único    | N/A               | ❌ No               |
+| `[DomainEvent]`       | Evento de dominio      | ❌ No             | ✅ Sí (obligatorio) |
 
 ---
 

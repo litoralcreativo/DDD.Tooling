@@ -36,11 +36,30 @@
     - [x] Detecta campos y propiedades privadas/protegidas
     - [ ] Code Fix: sin fix por decisión de diseño (requiere juicio del desarrollador)
 
-## ✅ Implementado (v1.2)
+## ✅ Implementado (v1.2) — Runtime Support + Nuevos Analizadores
 
 - [x] **DDD013** - Solo puede haber un `[EntityId]` por clase ❌ Error
     - [x] Detecta múltiples propiedades con `[EntityId]` en la misma entidad o agregado
     - [ ] Code Fix: sin fix por decisión de diseño (¿cuál ID es el correcto?)
+- [x] **Interfaces fundamentales** (`DDD.Tooling.Abstractions`)
+    - [x] `IDomainEvent` — Contrato para Domain Events con `OccurredOn: DateTime`
+    - [x] `IEntity<TId>` — Contrato genérico para entidades
+    - [x] `IAggregateRoot<TId>` — Contrato para agregados (extiende `IEntity<TId>`)
+- [x] **Base classes** (`DDD.Tooling.Abstractions`)
+    - [x] `Entity<TId>` — Igualdad por Id, operadores `==`/`!=`
+    - [x] `AggregateRoot<TId>` — Extiende Entity, `RaiseDomainEvent()`, seguimiento de eventos
+    - [x] `ValueObject` — Igualdad por componentes, `GetEqualityComponents()` abstracto
+- [x] **DDD017** — AggregateRoot debe implementar `IAggregateRoot<TId>` ❌ Error
+    - [x] Code Fix: agrega `: AggregateRoot<Guid>` automáticamente
+- [x] **DDD018** — Entity debe implementar `IEntity<TId>` ❌ Error
+    - [x] Code Fix: agrega `: Entity<Guid>` automáticamente
+- [x] **DDD019** — DomainEvent debe implementar `IDomainEvent` ❌ Error
+    - [x] Code Fix: agrega `: IDomainEvent` automáticamente
+- [x] **DDD020** — ValueObject debe heredar de base class `ValueObject` ❌ Error
+    - [x] Code Fix: agrega `: ValueObject` automáticamente
+- [x] **DDD001/DDD002** mejorados — Detectan herencia de `Entity<TId>` / `AggregateRoot<TId>` (atributo `[EntityId]` opcional)
+- [x] **DDD007/DDD008** mejorados — Opcionales si heredan de `ValueObject` (implementación automática)
+- [x] Publicado en NuGet.org como `DDD.Tooling.Abstractions 1.2.0` + `DDD.Tooling.Analyzers 1.2.0`
 
 ## ✅ Implementado (v1.3) — Testing
 
@@ -83,7 +102,7 @@
 
 ### Fase 6 - Analizadores Adicionales
 
-#### DDD017 - Repository pattern
+#### DDD021 - Repository pattern
 
 ```csharp
 // Validar que los repositorios solo trabajen con AggregateRoots
@@ -119,4 +138,4 @@ public interface IProductRepository  // ⚠️ Warning: Product no es AggregateR
 
 ---
 
-**Última actualización**: 17 de Marzo 2026
+**Última actualización**: 17 de Marzo 2026 — v1.2.0

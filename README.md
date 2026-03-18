@@ -8,12 +8,14 @@ Proporcionar validación en tiempo de compilación de las reglas y patrones de D
 
 ## ✨ Características
 
-- ✅ **16 Reglas** de análisis DDD (DDD001-DDD016)
-- ✅ **9 Code Fix Providers** para corregir automáticamente errores/warnings
+- ✅ **20 Reglas** de análisis DDD (DDD001-DDD020)
+- ✅ **13 Code Fix Providers** para corregir automáticamente errores/warnings
+- ✅ **Runtime support**: interfaces (`IDomainEvent`, `IEntity<TId>`, `IAggregateRoot<TId>`) y base classes (`Entity<TId>`, `AggregateRoot<TId>`, `ValueObject`)
 - ✅ **Sugerencias educativas (Info)** para mejorar el diseño
 - ✅ **Manejo inteligente de tipos** (detecta automáticamente structs, nullables, referencias)
 - ✅ **Detección de referencias cruzadas** entre Bounded Contexts (DDD010-DDD012)
 - ✅ **Soporte para Domain Events** con validaciones de inmutabilidad y ciclo de vida (DDD014-DDD016)
+- ✅ **Validación de interfaces y herencia** para contratos DDD (DDD017-DDD020)
 - ✅ **Soporte para colecciones genéricas** (`List<T>`, `IReadOnlyCollection<T>`, etc.)
 - ✅ **Validación en tiempo real** en el IDE
 - ✅ **Errores, Warnings e Infos claros** con mensajes descriptivos
@@ -23,15 +25,23 @@ Proporcionar validación en tiempo de compilación de las reglas y patrones de D
 
 ```
 DDD.Tooling/
-├── DDD.Abstractions/           # Atributos DDD base
-│   └── Attributes/
-│       ├── EntityAttribute.cs
-│       ├── EntityIdAttribute.cs
-│       ├── AggregateRootAttribute.cs
-│       ├── ValueObjectAttribute.cs
-│       ├── BoundedContextAttribute.cs
-│       ├── SharedKernelAttribute.cs
-│       └── DomainEventAttribute.cs
+├── DDD.Abstractions/           # Atributos, interfaces y base classes DDD
+│   ├── Attributes/
+│   │   ├── EntityAttribute.cs
+│   │   ├── EntityIdAttribute.cs
+│   │   ├── AggregateRootAttribute.cs
+│   │   ├── ValueObjectAttribute.cs
+│   │   ├── BoundedContextAttribute.cs
+│   │   ├── SharedKernelAttribute.cs
+│   │   └── DomainEventAttribute.cs
+│   ├── Interfaces/
+│   │   ├── IDomainEvent.cs
+│   │   ├── IEntity.cs
+│   │   └── IAggregateRoot.cs
+│   └── Base/
+│       ├── Entity.cs
+│       ├── AggregateRoot.cs
+│       └── ValueObject.cs
 ├── DDD.Analyzers/              # Analizadores Roslyn
 │   ├── DiagnosticDescriptors.cs
 │   ├── EntityMustHaveEntityIdAnalyzer.cs             # DDD001
@@ -43,6 +53,10 @@ DDD.Tooling/
 │   ├── CrossBoundedContextReferenceAnalyzer.cs       # DDD011, DDD012
 │   ├── MultipleEntityIdAnalyzer.cs                   # DDD013
 │   ├── DomainEventAnalyzer.cs                        # DDD014, DDD015, DDD016
+│   ├── AggregateRootInterfaceImplementationAnalyzer.cs  # DDD017
+│   ├── EntityInterfaceImplementationAnalyzer.cs         # DDD018
+│   ├── DomainEventMustImplementInterfaceAnalyzer.cs     # DDD019
+│   ├── ValueObjectMustInheritFromBaseAnalyzer.cs        # DDD020
 │   └── CodeFixes/
 │       ├── EntityIdCodeFixProvider.cs                # Fix para DDD001/002
 │       ├── EntityIdOnPropertyCodeFixProvider.cs      # Fix para DDD003
@@ -51,7 +65,11 @@ DDD.Tooling/
 │       ├── BoundedContextDeclarationCodeFixProvider.cs # Fix para DDD010/016
 │       ├── CrossBoundedContextReferenceCodeFixProvider.cs # Fix para DDD011
 │       ├── DomainEventImmutabilityCodeFixProvider.cs # Fix para DDD014
-│       └── DomainEventOccurredOnCodeFixProvider.cs   # Fix para DDD015
+│       ├── DomainEventOccurredOnCodeFixProvider.cs   # Fix para DDD015
+│       ├── AggregateRootInheritanceCodeFixProvider.cs   # Fix para DDD017
+│       ├── EntityInheritanceCodeFixProvider.cs          # Fix para DDD018
+│       ├── DomainEventInterfaceCodeFixProvider.cs       # Fix para DDD019
+│       └── ValueObjectInheritanceCodeFixProvider.cs     # Fix para DDD020
 ├── DDD.Analyzers.Tests/        # Tests unitarios (91 tests)
 │   ├── Analyzers/              # Tests DDD001–DDD016
 │   ├── CodeFixes/              # Tests de Code Fixes
@@ -403,31 +421,80 @@ public class CoursePublishedEvent
 
 ---
 
+### DDD017 - AggregateRoot debe implementar IAggregateRoot&lt;TId&gt; ❌ Error
+
+**Descripción**: Las clases decoradas con `[AggregateRoot]` deben implementar `IAggregateRoot<TId>` o heredar de la base class `AggregateRoot<TId>`.
+
+**Quick Fix disponible**: Agrega `: AggregateRoot<Guid>` automáticamente.
+
+```csharp
+// ❌ DDD017: no implementa IAggregateRoot<TId>
+[AggregateRoot]
+public class Order { ... }
+
+// ✅ Correcto: hereda de base class
+[AggregateRoot]
+public class Order : AggregateRoot<Guid> { ... }
+```
+
+---
+
+### DDD018 - Entity debe implementar IEntity&lt;TId&gt; ❌ Error
+
+**Descripción**: Las clases decoradas con `[Entity]` deben implementar `IEntity<TId>` o heredar de la base class `Entity<TId>`.
+
+**Quick Fix disponible**: Agrega `: Entity<Guid>` automáticamente.
+
+---
+
+### DDD019 - DomainEvent debe implementar IDomainEvent ❌ Error
+
+**Descripción**: Las clases decoradas con `[DomainEvent]` deben implementar la interfaz `IDomainEvent`.
+
+**Quick Fix disponible**: Agrega `: IDomainEvent` automáticamente.
+
+```csharp
+// ❌ DDD019: no implementa IDomainEvent
+[DomainEvent]
+public class OrderCreatedEvent { ... }
+
+// ✅ Correcto:
+[DomainEvent]
+public class OrderCreatedEvent : IDomainEvent { ... }
+```
+
+---
+
+### DDD020 - ValueObject debe heredar de ValueObject base class ❌ Error
+
+**Descripción**: Las clases decoradas con `[ValueObject]` deben heredar de la base class `ValueObject` para obtener implementación automática de igualdad por componentes.
+
+**Quick Fix disponible**: Agrega `: ValueObject` automáticamente.
+
+---
+
 ## 🚀 Uso
 
-### 1. Instalar las abstracciones
+### 1. Instalar los paquetes NuGet
 
-Agrega referencia al proyecto `DDD.Abstractions`:
+```bash
+dotnet add package DDD.Tooling.Abstractions
+dotnet add package DDD.Tooling.Analyzers
+```
+
+O en el `.csproj`:
 
 ```xml
 <ItemGroup>
-  <ProjectReference Include="..\DDD.Abstractions\DDD.Abstractions.csproj" />
+  <PackageReference Include="DDD.Tooling.Abstractions" Version="1.2.0" />
+  <PackageReference Include="DDD.Tooling.Analyzers" Version="1.2.0">
+    <PrivateAssets>all</PrivateAssets>
+    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+  </PackageReference>
 </ItemGroup>
 ```
 
-### 2. Instalar los analizadores
-
-Agrega referencia al proyecto `DDD.Analyzers` como analizador:
-
-```xml
-<ItemGroup>
-  <ProjectReference Include="..\DDD.Analyzers\DDD.Analyzers.csproj"
-                    OutputItemType="Analyzer"
-                    ReferenceOutputAssembly="false" />
-</ItemGroup>
-```
-
-### 3. Usar los atributos en tu código
+### 2. Usar los atributos y base classes en tu código
 
 ```csharp
 using DDD.Abstractions;

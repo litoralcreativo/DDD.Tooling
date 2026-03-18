@@ -234,9 +234,9 @@ Errors:
 
 ## 🚀 Próximos Pasos
 
-1. **Tests unitarios** para cada analizador
-2. **Publicar NuGet package** para uso público
-3. **Nuevas reglas** según el ROADMAP.md (DDD014+)
+1. **Explorar base classes** — Usa `Entity<TId>`, `AggregateRoot<TId>` y `ValueObject` para más beneficios
+2. **Revisa el ROADMAP** — Nuevas reglas y funcionalidades en camino
+3. **Configura `.editorconfig`** — Ajusta severidades según tu proyecto
 
 ---
 

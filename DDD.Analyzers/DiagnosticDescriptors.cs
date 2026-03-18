@@ -170,5 +170,41 @@ namespace DDD.Analyzers
 			defaultSeverity: DiagnosticSeverity.Warning,
 			isEnabledByDefault: true,
 			description: "Los Domain Events deben declarar a qué Bounded Context pertenecen mediante [BoundedContext(\"NombreBC\")] para facilitar el análisis de dependencias entre contextos.");
+
+		public static readonly DiagnosticDescriptor AggregateRootMustImplementInterface = new DiagnosticDescriptor(
+			id: "DDD017",
+			title: "AggregateRoot decorado debe implementar IAggregateRoot<TId>",
+			messageFormat: "La clase '{0}' está decorada con [AggregateRoot] pero no implementa IAggregateRoot<TId>. Hereda de AggregateRoot<TId> o implementa la interfaz directamente.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Error,
+			isEnabledByDefault: true,
+			description: "Si decoras una clase con [AggregateRoot], debe implementar IAggregateRoot<TId> (directa o indirectamente a través de AggregateRoot<TId>). Sin esto, el decorador es inútil.");
+
+		public static readonly DiagnosticDescriptor EntityMustImplementInterface = new DiagnosticDescriptor(
+			id: "DDD018",
+			title: "Entity decorado debe implementar IEntity<TId>",
+			messageFormat: "La clase '{0}' está decorada con [Entity] pero no implementa IEntity<TId>. Hereda de Entity<TId> o implementa la interfaz directamente.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Error,
+			isEnabledByDefault: true,
+			description: "Si decoras una clase con [Entity], debe implementar IEntity<TId> (directa o indirectamente a través de Entity<TId>). Sin esto, el decorador es inútil.");
+
+		public static readonly DiagnosticDescriptor DomainEventMustImplementInterface = new DiagnosticDescriptor(
+			id: "DDD019",
+			title: "DomainEvent decorado debe implementar IDomainEvent",
+			messageFormat: "La clase '{0}' está decorada con [DomainEvent] pero no implementa IDomainEvent. Implementa la interfaz para que el evento sea compatible con AggregateRoot.DomainEvents.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Error,
+			isEnabledByDefault: true,
+			description: "Si decoras una clase con [DomainEvent], debe implementar IDomainEvent. Esto garantiza que puedas guardar el evento en AggregateRoot<TId>.DomainEvents (que es IReadOnlyList<IDomainEvent>).");
+
+		public static readonly DiagnosticDescriptor ValueObjectMustInheritFromBase = new DiagnosticDescriptor(
+			id: "DDD020",
+			title: "ValueObject decorado debe heredar de ValueObject",
+			messageFormat: "La clase '{0}' está decorada con [ValueObject] pero no hereda de ValueObject. Hereda de ValueObject para obtener la implementación automática de igualdad por valor.",
+			category: Category,
+			defaultSeverity: DiagnosticSeverity.Error,
+			isEnabledByDefault: true,
+			description: "Si decoras una clase con [ValueObject], debe heredar de ValueObject (del namespace DDD.Abstractions). Esto proporciona la implementación de Equals, GetHashCode y operadores == / != basados en los componentes del Value Object.");
 	}
 }

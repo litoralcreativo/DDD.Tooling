@@ -37,15 +37,20 @@ namespace DDD.Analyzers
 				.Any(attr => attr.AttributeClass?.Name == "AggregateRootAttribute" &&
 							attr.AttributeClass?.ContainingNamespace?.ToString() == "DDD.Abstractions");
 
+			// Si no tiene [AggregateRoot], tampoco aplica la regla DDD002
 			if (!hasAggregateRootAttribute)
 				return;
 
-			// Buscar si alguna propiedad tiene el atributo [EntityId]
+			// Buscar si alguna propiedad tiene el atributo [EntityId] (en la clase o en cualquier clase base)
 			var hasEntityIdProperty = classSymbol.GetMembers()
 				.OfType<IPropertySymbol>()
 				.Any(prop => prop.GetAttributes()
 					.Any(attr => attr.AttributeClass?.Name == "EntityIdAttribute" &&
 								attr.AttributeClass?.ContainingNamespace?.ToString() == "DDD.Abstractions"));
+
+			// También es válido si hereda de IAggregateRoot<TId>, AggregateRoot<TId> o IEntity<TId>
+			if (!hasEntityIdProperty)
+				hasEntityIdProperty = InheritsFromAggregateBase(classSymbol);
 
 			if (!hasEntityIdProperty)
 			{
@@ -56,6 +61,31 @@ namespace DDD.Analyzers
 
 				context.ReportDiagnostic(diagnostic);
 			}
+		}
+
+		/// <summary>
+		/// Devuelve true si la clase hereda (directa o indirectamente) de
+		/// <c>DDD.Abstractions.AggregateRoot&lt;TId&gt;</c> o implementa <c>DDD.Abstractions.IAggregateRoot&lt;TId&gt;</c>.
+		/// </summary>
+		private static bool InheritsFromAggregateBase(INamedTypeSymbol classSymbol)
+		{
+			// Comprobar interfaces implementadas (resuelve toda la cadena de herencia)
+			if (classSymbol.AllInterfaces.Any(i =>
+				(i.OriginalDefinition.Name == "IAggregateRoot" || i.OriginalDefinition.Name == "IEntity") &&
+				i.OriginalDefinition.ContainingNamespace?.ToString() == "DDD.Abstractions"))
+				return true;
+
+			// Comprobar clase base (AggregateRoot<TId> o Entity<TId>)
+			var baseType = classSymbol.BaseType;
+			while (baseType != null)
+			{
+				if ((baseType.OriginalDefinition.Name == "AggregateRoot" || baseType.OriginalDefinition.Name == "Entity") &&
+					baseType.OriginalDefinition.ContainingNamespace?.ToString() == "DDD.Abstractions")
+					return true;
+				baseType = baseType.BaseType;
+			}
+
+			return false;
 		}
 	}
 }

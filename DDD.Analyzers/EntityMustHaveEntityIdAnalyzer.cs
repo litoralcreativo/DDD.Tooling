@@ -37,6 +37,7 @@ namespace DDD.Analyzers
 				.Any(attr => attr.AttributeClass?.Name == "EntityAttribute" &&
 							attr.AttributeClass?.ContainingNamespace?.ToString() == "DDD.Abstractions");
 
+			// Si no tiene [Entity], tampoco aplica la regla DDD001
 			if (!hasEntityAttribute)
 				return;
 
@@ -47,6 +48,10 @@ namespace DDD.Analyzers
 					.Any(attr => attr.AttributeClass?.Name == "EntityIdAttribute" &&
 								attr.AttributeClass?.ContainingNamespace?.ToString() == "DDD.Abstractions"));
 
+			// También es válido si hereda de IEntity<TId> o de una clase base que lo implemente
+			if (!hasEntityIdProperty)
+				hasEntityIdProperty = InheritsFromEntityBase(classSymbol);
+
 			if (!hasEntityIdProperty)
 			{
 				var diagnostic = Diagnostic.Create(
@@ -56,6 +61,31 @@ namespace DDD.Analyzers
 
 				context.ReportDiagnostic(diagnostic);
 			}
+		}
+
+		/// <summary>
+		/// Devuelve true si la clase hereda (directa o indirectamente) de
+		/// <c>DDD.Abstractions.Entity&lt;TId&gt;</c> o implementa <c>DDD.Abstractions.IEntity&lt;TId&gt;</c>.
+		/// </summary>
+		private static bool InheritsFromEntityBase(INamedTypeSymbol classSymbol)
+		{
+			// Comprobar interfaces implementadas (resuelve toda la cadena de herencia)
+			if (classSymbol.AllInterfaces.Any(i =>
+				i.OriginalDefinition.Name == "IEntity" &&
+				i.OriginalDefinition.ContainingNamespace?.ToString() == "DDD.Abstractions"))
+				return true;
+
+			// Comprobar clase base (Entity<TId>)
+			var baseType = classSymbol.BaseType;
+			while (baseType != null)
+			{
+				if (baseType.OriginalDefinition.Name == "Entity" &&
+					baseType.OriginalDefinition.ContainingNamespace?.ToString() == "DDD.Abstractions")
+					return true;
+				baseType = baseType.BaseType;
+			}
+
+			return false;
 		}
 	}
 }

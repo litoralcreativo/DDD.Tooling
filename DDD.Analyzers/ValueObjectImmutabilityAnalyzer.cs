@@ -43,6 +43,9 @@ namespace DDD.Analyzers
 			if (!hasValueObjectAttribute)
 				return;
 
+			// Verificar si hereda de ValueObject
+			var inheritsFromValueObject = InheritsFromValueObject(classSymbol);
+
 			// 1. Verificar propiedades con setters públicos (inmutabilidad)
 			// Excluimos init setters, ya que son válidos en ValueObjects (inmutables tras construcción)
 			var propertiesWithPublicSetters = classSymbol.GetMembers()
@@ -67,13 +70,14 @@ namespace DDD.Analyzers
 			}
 
 			// 2. Verificar que sobrescriba Equals(object)
+			// Si hereda de ValueObject, ya lo tiene delegado a GetEqualityComponents()
 			var overridesEquals = classSymbol.GetMembers("Equals")
 				.OfType<IMethodSymbol>()
 				.Any(m => m.IsOverride &&
 						 m.Parameters.Length == 1 &&
 						 m.Parameters[0].Type.SpecialType == SpecialType.System_Object);
 
-			if (!overridesEquals)
+			if (!overridesEquals && !inheritsFromValueObject)
 			{
 				var diagnostic = Diagnostic.Create(
 					DiagnosticDescriptors.ValueObjectMustOverrideEquals,
@@ -84,11 +88,12 @@ namespace DDD.Analyzers
 			}
 
 			// 3. Verificar que sobrescriba GetHashCode()
+			// Si hereda de ValueObject, ya lo tiene delegado a GetEqualityComponents()
 			var overridesGetHashCode = classSymbol.GetMembers("GetHashCode")
 				.OfType<IMethodSymbol>()
 				.Any(m => m.IsOverride && m.Parameters.Length == 0);
 
-			if (!overridesGetHashCode)
+			if (!overridesGetHashCode && !inheritsFromValueObject)
 			{
 				var diagnostic = Diagnostic.Create(
 					DiagnosticDescriptors.ValueObjectMustOverrideGetHashCode,
@@ -97,6 +102,21 @@ namespace DDD.Analyzers
 
 				context.ReportDiagnostic(diagnostic);
 			}
+		}
+
+		private bool InheritsFromValueObject(INamedTypeSymbol classSymbol)
+		{
+			var current = classSymbol.BaseType;
+			while (current != null)
+			{
+				if (current.Name == "ValueObject" &&
+					current.ContainingNamespace?.ToString() == "DDD.Abstractions")
+				{
+					return true;
+				}
+				current = current.BaseType;
+			}
+			return false;
 		}
 	}
 }

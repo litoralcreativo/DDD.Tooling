@@ -1,17 +1,14 @@
 ﻿using DDD.Abstractions;
 using System;
 using System.Collections.Generic;
+using TestDomain.Catalog.Events;
 
 namespace TestDomain.Catalog
 {
     [BoundedContext("Catalog")]  // DDD010: 'Course' declara su Bounded Context
     [AggregateRoot]
-    public class Course
+    public class Course : AggregateRoot<Guid>
     {
-        // Agregamos la propiedad con [EntityId] como identificador de la entidad. Regla DDD001
-        [EntityId]
-        public Guid Id { get; private set; }
-
         private List<CourseModule> _modules = new List<CourseModule>();
         public IReadOnlyCollection<CourseModule> Modules => _modules.AsReadOnly();
 
@@ -39,6 +36,18 @@ namespace TestDomain.Catalog
                 throw new ArgumentNullException(nameof(module));
 
             _modules.Add(module);
+        }
+
+        public void PublishCourse()
+        {
+            // Lógica de negocio para publicar el curso (ej. validar que tenga módulos, etc.)
+            if (_modules.Count == 0)
+                throw new InvalidOperationException("Cannot publish a course without modules.");
+
+            // Aquí se podría agregar lógica adicional, como cambiar el estado del curso a "Publicado", etc.
+
+            // Regla DDD012: Al publicar el curso, se genera un evento de dominio
+            RaiseDomainEvent(new CoursePublishedEvent(Id, Name, DateTime.UtcNow));
         }
     }
 }

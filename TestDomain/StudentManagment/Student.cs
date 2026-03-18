@@ -8,10 +8,10 @@ namespace TestDomain.StudentManagment
 {
 	[BoundedContext("StudentManagment")]
 	[AggregateRoot]
-	public class Student
+	public class Student : AggregateRoot<Guid>
 	{
 		[EntityId]
-		public Guid StudentId { get; private set; }
+		public override Guid Id { get; protected set; }
 
 		public string FirstName { get; set; }
 		public string LastName { get; set; }
@@ -26,7 +26,7 @@ namespace TestDomain.StudentManagment
 
 		internal Student(Guid studentId, string firstName, string lastName, Address address)
 		{
-			StudentId = studentId;
+			Id = studentId;
 			FirstName = firstName;
 			LastName = lastName;
 			EnrollmentDate = DateTime.UtcNow;
